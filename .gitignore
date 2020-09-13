@@ -1,2 +1,5 @@
 *.wasm
 *.out.*
+
+*.o
+build/
