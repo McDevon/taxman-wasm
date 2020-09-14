@@ -1,5 +1,19 @@
 CC=emcc
-CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s EXPORTED_FUNCTIONS='["_main"]' --js-library web/taxmanLib.js
+CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
+       -s EXPORTED_FUNCTIONS='["_main"]' \
+	   -fsanitize=undefined \
+	   --js-library web/taxmanLib.js \
+	   -I taxman-engine/Engine/Actions/ \
+	   -I taxman-engine/Engine/Components/ \
+	   -I taxman-engine/Engine/Logic/ \
+	   -I taxman-engine/Engine/Math/ \
+	   -I taxman-engine/Engine/Render/ \
+	   -I taxman-engine/Engine/Resources/ \
+	   -I taxman-engine/Engine/Scene/ \
+	   -I taxman-engine/Engine/Strings/ \
+	   -I taxman-engine/Engine/Utils/ \
+	   -I platform/ \
+	   -I game/scenes/
 
 OUT_DIR=build
 OBJ_DIR=obj
@@ -7,7 +21,18 @@ SRC_DIR=platform
 COPY_DIR=web
 
 MKDIR_P=mkdir -p
-SRC=$(wildcard $(SRC_DIR)/*.c)
+CSRC = $(wildcard platform/*.c) \
+       $(wildcard taxman-engine/Engine/Actions/*.c) \
+       $(wildcard taxman-engine/Engine/Components/*.c) \
+       $(wildcard taxman-engine/Engine/Logic/*.c) \
+       $(wildcard taxman-engine/Engine/Math/*.c) \
+       $(wildcard taxman-engine/Engine/Render/*.c) \
+       $(wildcard taxman-engine/Engine/Resources/*.c) \
+       $(wildcard taxman-engine/Engine/Scene/*.c) \
+       $(wildcard taxman-engine/Engine/Strings/*.c) \
+       $(wildcard taxman-engine/Engine/Utils/*.c) \
+       $(wildcard game/scenes/*.c)
+OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 
 .PHONY: all clean directories
@@ -15,7 +40,7 @@ COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 all: directories $(COPY_FILES) game
 
 clean:
-	rm -rf ${OUT_DIR} ${OBJ_DIR} *.o
+	rm -rf ${OUT_DIR} ${OBJ_DIR} ${OBJ} *.o
 
 directories: ${OUT_DIR}
 
@@ -26,10 +51,10 @@ $(OUT_DIR)/index.html: $(COPY_DIR)/index.html
 $(OUT_DIR)/loader.js: $(COPY_DIR)/loader.js
 $(OUT_DIR)/taxmanLib.js: $(COPY_DIR)/taxmanLib.js
 
--include $(OBJ:.o=.d)
+#-include $(OBJ:.o=.d)
 
 $(OUT_DIR)/%:
 	cp -f $< $@
 
-game: sdl_test.o
-	$(CC) $(CFLAGS) -o ${OUT_DIR}/core.js sdl_test.o
+game: $(OBJ) $(CSRC) sdl_test.o
+	$(CC) $(CFLAGS) -o ${OUT_DIR}/core.js $(OBJ) sdl_test.o

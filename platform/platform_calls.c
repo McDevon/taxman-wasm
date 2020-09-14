@@ -22,9 +22,9 @@ void platform_display_set_image(uint8_t *buffer)
 
     if (SDL_MUSTLOCK(screen))
         SDL_LockSurface(screen);
-    for (int y = 0; y < SCREEN_HEIGHT; ++y)
+    /*for (int x = 0; x < SCREEN_WIDTH; ++x)
     {
-        for (int x = 0; x < SCREEN_WIDTH; ++x)
+        for (int y = 0; y < SCREEN_HEIGHT; ++y)
         {
 #ifdef TEST_SDL_LOCK_OPTS
             int alpha = 255;
@@ -34,6 +34,12 @@ void platform_display_set_image(uint8_t *buffer)
             int color = y ^ x;
             *((Uint32 *)screen->pixels + y * SCREEN_HEIGHT + x) = SDL_MapRGBA(screen->format, color, color, color, alpha);
         }
+    }*/
+    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
+        uint8_t color = buffer[i];
+        int x = i % SCREEN_WIDTH;
+        int y = i / SCREEN_WIDTH;
+        *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = SDL_MapRGBA(screen->format, color, color, color, 255);
     }
     if (SDL_MUSTLOCK(screen))
         SDL_UnlockSurface(screen);

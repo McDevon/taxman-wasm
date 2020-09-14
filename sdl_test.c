@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <SDL/SDL.h>
-//#include "engine.h"
-//#include "test_scene.h"
+#include "engine.h"
+#include "test_scene.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -10,17 +10,20 @@
 extern void start();
 
 int main(int argc, char** argv) {
+  printf("Start\n");
+  GameObject *scene = test_scene_create();
+  printf("Test scene %s\n", describe(scene));
+  game_init(scene);
   start();
-  //game_init(test_scene_create());
   return 0;
 }
 
 EMSCRIPTEN_KEEPALIVE
 void step(int time) {
-  //Controls controls = { (uint32_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0 };
-  //Number delta = nb_from_double(0.0333333333 * 1000);
-  //game_step(delta, controls);
-
+  Controls controls = { (uint32_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0, (uint8_t)0 };
+  Number delta = nb_from_double(0.0333333333 * 1000);
+  game_step(delta, controls);
+/*
   SDL_Init(SDL_INIT_VIDEO);
     SDL_Surface *screen = SDL_SetVideoMode(300, 300, 32, SDL_SWSURFACE);
 
@@ -47,6 +50,8 @@ void step(int time) {
         SDL_UnlockSurface(screen);
     SDL_Flip(screen);
 
-    SDL_Quit();
+    SDL_Quit();*/
+
+    printf("step\n");
 }
 

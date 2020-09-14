@@ -125,11 +125,12 @@ void test_scene_render(GameObject *scene, RenderContext *ctx)
 {
     TestScene *self = (TestScene *)scene;
 
-    Image *dither = get_image(_dithers[self->selected_dither]);
+    //Image *dither = get_image(_dithers[self->selected_dither]);
     ImageData *xor_data = image_data_xor_texture((Size2DInt){ SCREEN_WIDTH, SCREEN_HEIGHT }, (Vector2DInt){ 0, 0 }, 0);
     Image *xor = image_from_data(xor_data);
     //image_render_dither(ctx, xor, dither, 0, 0, nb_to_int(self->step), nb_to_int(self->step) / 4);
-    image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ 0, 0 }, 0);
+    image_render(ctx, xor, (Vector2DInt){ 0, 0 }, 0);
+    //image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ 0, 0 }, 0);
     destroy(xor);
     destroy(xor_data);
 }
