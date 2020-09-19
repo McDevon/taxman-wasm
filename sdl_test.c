@@ -2,6 +2,7 @@
 #include <SDL/SDL.h>
 #include "engine.h"
 #include "test_scene.h"
+#include "platform_calls.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -14,6 +15,7 @@ int main(int argc, char** argv) {
   GameObject *scene = test_scene_create();
   printf("Test scene %s\n", describe(scene));
   game_init(scene);
+  sdl_setup();
   start();
   return 0;
 }

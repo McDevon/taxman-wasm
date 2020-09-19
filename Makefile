@@ -13,7 +13,7 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
 	   -I taxman-engine/Engine/Strings/ \
 	   -I taxman-engine/Engine/Utils/ \
 	   -I platform/ \
-	   -I game/scenes/
+	   -I game/
 
 OUT_DIR=build
 OBJ_DIR=obj
@@ -31,7 +31,8 @@ CSRC = $(wildcard platform/*.c) \
        $(wildcard taxman-engine/Engine/Scene/*.c) \
        $(wildcard taxman-engine/Engine/Strings/*.c) \
        $(wildcard taxman-engine/Engine/Utils/*.c) \
-       $(wildcard game/scenes/*.c)
+       $(wildcard game/*.c) \
+       $(wildcard assets/*.c)
 OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 

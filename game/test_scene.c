@@ -19,6 +19,7 @@ typedef struct {
     int32_t step;
     int32_t selected_dither;
     int32_t crank_mode;
+    Bool rendered;
 } TestScene;
 
 void test_scene_update(GameObject *scene, Number dt_ms)
@@ -26,6 +27,11 @@ void test_scene_update(GameObject *scene, Number dt_ms)
     TestScene *self = (TestScene *)scene;
 
     LOG("Update test scene");
+
+    self->step += nb_mul(nb_from_int(20), dt_ms) / 1000;
+    if (self->step >= nb_from_int(256)) {
+        self->step -= nb_from_int(256);
+    }
     
     /*Number prev_crank = self->previous_controls.crank;
     Number curr_crank = go_get_scene_manager(self)->controls.crank;
@@ -125,11 +131,17 @@ void test_scene_render(GameObject *scene, RenderContext *ctx)
 {
     TestScene *self = (TestScene *)scene;
 
+    /*if (self->rendered) {
+        return;
+    }
+
+    self->rendered = True;*/
     //Image *dither = get_image(_dithers[self->selected_dither]);
+    Image *dither = get_image("dither_blue");
     ImageData *xor_data = image_data_xor_texture((Size2DInt){ SCREEN_WIDTH, SCREEN_HEIGHT }, (Vector2DInt){ 0, 0 }, 0);
     Image *xor = image_from_data(xor_data);
-    //image_render_dither(ctx, xor, dither, 0, 0, nb_to_int(self->step), nb_to_int(self->step) / 4);
-    image_render(ctx, xor, (Vector2DInt){ 0, 0 }, 0);
+    image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ nb_to_int(self->step), nb_to_int(self->step) / 4 }, 0);
+    //image_render(ctx, xor, (Vector2DInt){ 0, 0 }, 0);
     //image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ 0, 0 }, 0);
     destroy(xor);
     destroy(xor_data);
@@ -140,6 +152,10 @@ void test_scene_initialize(GameObject *scene)
     TestScene *self = (TestScene *)scene;
 
     LOG("Enter test scene");
+    load_image_data("dither_blue", False, True);
+
+    self->rendered = False;
+
     
     self->previous_controls = go_get_scene_manager(self)->controls;
     self->selected_dither = 3;

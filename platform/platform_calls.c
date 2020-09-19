@@ -11,10 +11,17 @@
 #define SCREEN_WIDTH 400
 #define SCREEN_HEIGHT 240
 
-void platform_display_set_image(uint8_t *buffer)
+SDL_Surface *screen;
+
+void sdl_setup()
 {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Surface *screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+
+}
+
+void platform_display_set_image(uint8_t *buffer)
+{
 
 #ifdef TEST_SDL_LOCK_OPTS
     EM_ASM("SDL.defaults.copyOnLock = false; SDL.defaults.discardOnLock = true; SDL.defaults.opaqueFrontBuffer = false;");
@@ -44,8 +51,6 @@ void platform_display_set_image(uint8_t *buffer)
     if (SDL_MUSTLOCK(screen))
         SDL_UnlockSurface(screen);
     SDL_Flip(screen);
-
-    SDL_Quit();
 }
 
 void *platform_malloc(size_t size)
