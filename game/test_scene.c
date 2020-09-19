@@ -7,19 +7,8 @@ static char *_dithers[] = { "dither_dot", "dither_diag", "dither_smoke" };
 
 typedef struct {
     GAME_OBJECT;
-    Label *w_hello_label;
-    Label *w_rotate_label;
-    Label *w_mode_label;
     Controls previous_controls;
-    Number leftover;
-    Number c_rotation;
-    Number c_scale;
-    Number letter_timer;
-    Number scene_timer;
     int32_t step;
-    int32_t selected_dither;
-    int32_t crank_mode;
-    Bool rendered;
 } TestScene;
 
 void test_scene_update(GameObject *scene, Number dt_ms)
@@ -131,18 +120,10 @@ void test_scene_render(GameObject *scene, RenderContext *ctx)
 {
     TestScene *self = (TestScene *)scene;
 
-    /*if (self->rendered) {
-        return;
-    }
-
-    self->rendered = True;*/
-    //Image *dither = get_image(_dithers[self->selected_dither]);
     Image *dither = get_image("dither_blue");
     ImageData *xor_data = image_data_xor_texture((Size2DInt){ SCREEN_WIDTH, SCREEN_HEIGHT }, (Vector2DInt){ 0, 0 }, 0);
     Image *xor = image_from_data(xor_data);
     image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ nb_to_int(self->step), nb_to_int(self->step) / 4 }, 0);
-    //image_render(ctx, xor, (Vector2DInt){ 0, 0 }, 0);
-    //image_render_dither(ctx, xor, dither, (Vector2DInt){ 0, 0 }, (Vector2DInt){ 0, 0 }, 0);
     destroy(xor);
     destroy(xor_data);
 }
@@ -153,86 +134,6 @@ void test_scene_initialize(GameObject *scene)
 
     LOG("Enter test scene");
     load_image_data("dither_blue", False, True);
-
-    self->rendered = False;
-
-    
-    self->previous_controls = go_get_scene_manager(self)->controls;
-    self->selected_dither = 3;
-    self->crank_mode = 0;
-    self->c_scale = nb_one;
-    self->c_rotation = nb_zero;
-    self->letter_timer = 50000;
-    self->scene_timer = 2500000;
-    
-    /*Sprite *wall = ({
-        Sprite *wall = sprite_create("sapeli_slice");
-        wall->position.x = nb_from_int(140);
-        wall->position.y = nb_from_int(100);
-        wall->anchor.x = nb_half;
-        wall->anchor.y = nb_half;
-        wall;
-    });*/
-    
-    /*self->w_hello_label = ({
-        Label *label = label_create("font", "Hello World!");
-        label->position.x = nb_from_int(200);
-        label->position.y = nb_from_int(140);
-        label->anchor.x = nb_half;
-        label->anchor.y = nb_half;
-        label->rotate_and_scale = True;
-        label;
-    });
-    
-    describe_deubg_to_log(self->w_hello_label);
-    
-    go_add_child(self, self->w_hello_label);
-    
-    Sprite *wall2 = ({
-        Sprite *wall = sprite_create("rock_0ld");
-        wall->position.x = nb_from_int(0);
-        wall->position.y = nb_from_int(-100);
-        wall->anchor.x = nb_half;
-        wall->anchor.y = nb_half;
-        wall;
-    });
-
-    go_add_child(self->w_hello_label, wall2);
-    
-    self->w_rotate_label = ({
-        Label *label = label_create("font", "Transform: True\nRow 2");
-        label->position.x = nb_from_int(20);
-        label->position.y = nb_from_int(0);
-        label->anchor.x = nb_zero;
-        label->anchor.y = nb_half;
-        label->rotate_and_scale = True;
-        label;
-    });
-
-    go_add_child(wall2, self->w_rotate_label);
-
-    self->w_mode_label = ({
-        Label *label = label_create("font", "Crank: Rotate");
-        label->position.x = nb_from_int(SCREEN_WIDTH);
-        label->position.y = nb_from_int(0);
-        label->anchor.x = nb_one;
-        label->anchor.y = nb_zero;
-        label->rotate_and_scale = False;
-        label;
-    });
-
-    go_add_child(self, self->w_mode_label);
-
-    Sprite *wall3 = ({
-        Sprite *wall = sprite_create("rock_0lud");
-        wall->position.x = nb_from_int(0);
-        wall->position.y = nb_from_int(40);
-        wall->anchor.x = nb_half;
-        wall->anchor.y = nb_half;
-        wall;
-    });
-
-    go_add_child(wall2, wall3);*/
 }
 
 void test_scene_start(GameObject *scene)

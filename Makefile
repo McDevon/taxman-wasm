@@ -12,6 +12,9 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
 	   -I taxman-engine/Engine/Scene/ \
 	   -I taxman-engine/Engine/Strings/ \
 	   -I taxman-engine/Engine/Utils/ \
+	   -I taxman-engine/Tools/Camera/ \
+	   -I taxman-engine/Tools/Physics/ \
+	   -I taxman-engine/Tools/Tilemap/ \
 	   -I platform/ \
 	   -I game/
 
@@ -31,6 +34,9 @@ CSRC = $(wildcard platform/*.c) \
        $(wildcard taxman-engine/Engine/Scene/*.c) \
        $(wildcard taxman-engine/Engine/Strings/*.c) \
        $(wildcard taxman-engine/Engine/Utils/*.c) \
+       $(wildcard taxman-engine/Tools/Camera/*.c) \
+       $(wildcard taxman-engine/Tools/Physics/*.c) \
+       $(wildcard taxman-engine/Tools/Tilemap/*.c) \
        $(wildcard game/*.c) \
        $(wildcard assets/*.c)
 OBJ = $(CSRC:.c=.o)
