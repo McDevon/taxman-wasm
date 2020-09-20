@@ -1,6 +1,6 @@
-# Taxman WASM
+# Taxman Wasm
 
-This is the [Taxman Engine](https://github.com/mcdevon/taxman-engine) ported to Wasm.
+This is the [Taxman Engine](https://github.com/mcdevon/taxman-engine) running in your browser.
 
 The purpose of this project is to help me learn Wasm, as well as allow me to join game jams with [Playdate](http://play.date) games all the while allowing everyone to play even if they do not own the console.
 
@@ -9,7 +9,8 @@ Online demo is [available here](https://mcdevon.github.io/taxman-wasm/). NOTE: t
 ## Requirements
 
 1. For compiling, [Emscripten](https://emscripten.org/docs/getting_started/downloads.html) needs to be installed and in `PATH`
-2. The example uses Python 3 for serving the page locally. Any other means of setting up a server is equally adequate
+2. `make` is used as the build tool
+3. The example uses Python 3 for serving the page locally. Any other means of setting up a server is equally adequate
 
 ## Running
 
