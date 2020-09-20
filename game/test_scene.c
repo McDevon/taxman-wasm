@@ -58,9 +58,6 @@ void test_scene_render(GameObject *scene, RenderContext *ctx)
 void test_scene_initialize(GameObject *scene)
 {
     TestScene *self = (TestScene *)scene;
-
-    LOG("Enter test scene");
-    load_image_data("dither_blue", False, True);
 }
 
 void test_scene_start(GameObject *scene)
