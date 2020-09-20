@@ -13,6 +13,8 @@ Online demo is [available here](https://mcdevon.github.io/taxman-wasm/). NOTE: t
 
 ## Running
 
+Make sure you have the submodule checked out.
+
 Run in command line:
 
 ```
