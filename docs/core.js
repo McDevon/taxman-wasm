@@ -1228,10 +1228,10 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5768544,
+    STACK_BASE = 5768224,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 525664,
-    DYNAMIC_BASE = 5768544;
+    STACK_MAX = 525344,
+    DYNAMIC_BASE = 5768224;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1911,16 +1911,16 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  195552: function() {return withBuiltinMalloc(function () { return allocateUTF8(Module['UBSAN_OPTIONS'] || 0); });},  
- 202324: function() {return STACK_BASE;},  
- 202347: function() {return STACK_MAX;},  
- 216124: function() {var setting = Module['printWithColors']; if (setting != null) { return setting; } else { return ENVIRONMENT_IS_NODE && process.stderr.isTTY; }}
+  195536: function() {return withBuiltinMalloc(function () { return allocateUTF8(Module['UBSAN_OPTIONS'] || 0); });},  
+ 202308: function() {return STACK_BASE;},  
+ 202331: function() {return STACK_MAX;},  
+ 216108: function() {var setting = Module['printWithColors']; if (setting != null) { return setting; } else { return ENVIRONMENT_IS_NODE && process.stderr.isTTY; }}
 };
 
 
 
 
-// STATICTOP = STATIC_BASE + 524640;
+// STATICTOP = STATIC_BASE + 524320;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -7361,7 +7361,7 @@ var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
 /** @type {function(...*):?} */
 var __growWasmMemory = Module["__growWasmMemory"] = createExportWrapper("__growWasmMemory");
 
-Module['___heap_base'] = 5768544;
+Module['___heap_base'] = 5768224;
 Module['___global_base'] = 1024;
 
 
