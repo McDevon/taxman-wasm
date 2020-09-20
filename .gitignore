@@ -1,5 +1,2 @@
-*.wasm
-*.out.*
-
 *.o
-build/
+docs/

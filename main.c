@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <SDL/SDL.h>
 #include "engine.h"
-#include "test_scene.h"
+#include "loading_scene.h"
 #include "platform_calls.h"
 
 #ifdef __EMSCRIPTEN__
@@ -11,10 +11,7 @@
 extern void start();
 
 int main(int argc, char** argv) {
-  printf("Start\n");
-  GameObject *scene = test_scene_create();
-  printf("Test scene %s\n", describe(scene));
-  game_init(scene);
+  game_init(loading_scene_create());
   sdl_setup();
   start();
   return 0;
@@ -26,4 +23,3 @@ void step(double time, int left, int right, int up, int down, int a, int b, int 
     Number delta = nb_from_double(time * 1000);
     game_step(delta, controls);
 }
-

@@ -18,7 +18,7 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
 	   -I platform/ \
 	   -I game/
 
-OUT_DIR=build
+OUT_DIR=docs
 OBJ_DIR=obj
 SRC_DIR=platform
 COPY_DIR=web
@@ -63,5 +63,5 @@ $(OUT_DIR)/taxmanLib.js: $(COPY_DIR)/taxmanLib.js
 $(OUT_DIR)/%:
 	cp -f $< $@
 
-game: $(OBJ) $(CSRC) sdl_test.o
-	$(CC) $(CFLAGS) -o ${OUT_DIR}/core.js $(OBJ) sdl_test.o
+game: $(OBJ) $(CSRC) main.o
+	$(CC) $(CFLAGS) -o ${OUT_DIR}/core.js $(OBJ) main.o
