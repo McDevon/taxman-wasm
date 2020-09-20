@@ -1,9 +1,9 @@
 const vendorCheck = () => {
-    const vendors = ['webkit', 'moz'];
+    const vendors = ['webkit', 'moz']
     for (let x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame']
         window.cancelAnimationFrame =
-            window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+            window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame']
     }
 }
 
@@ -19,7 +19,7 @@ const registerKeys = () => {
     window.currentKeys.menu = 0
 
     const keyDown = (e) => {
-        e = e || window.event;
+        e = e || window.event
 
         console.log("key " + e.keyCode)
 
@@ -40,7 +40,7 @@ const registerKeys = () => {
         }
     }
     const keyUp = (e) => {
-        e = e || window.event;
+        e = e || window.event
 
         if (e.keyCode == '37' || e.keyCode == '65') {
             window.currentKeys.left = 0
@@ -59,22 +59,24 @@ const registerKeys = () => {
         }
     }
 
-    document.onkeydown = keyDown;
-    document.onkeyup = keyUp;
+    document.onkeydown = keyDown
+    document.onkeyup = keyUp
 }
 
 const startRender = () => {
 
-    var canvas = document.getElementById('canvas');
+    document.getElementById("output").style.display = "none"
 
-    const ctx = canvas.getContext('2d');
+    var canvas = document.getElementById('canvas')
 
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
+    const ctx = canvas.getContext('2d')
+
+    ctx.mozImageSmoothingEnabled = false
+    ctx.webkitImageSmoothingEnabled = false
 
     vendorCheck()
 
-    step = Module.cwrap('step', null, ['number']);
+    step = Module.cwrap('step', null, ['number'])
 
     let lastTime = (new Date()).getTime(),
         currentTime = 0,
