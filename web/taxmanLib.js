@@ -21,8 +21,6 @@ const registerKeys = () => {
     const keyDown = (e) => {
         e = e || window.event
 
-        console.log("key " + e.keyCode)
-
         if (e.keyCode == '37' || e.keyCode == '65') {
             window.currentKeys.left = 1
         } else if (e.keyCode == '39' || e.keyCode == '68') {
