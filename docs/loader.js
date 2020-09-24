@@ -7,14 +7,9 @@ var Module = {
   postRun: [],
   print: (function() {
     var element = document.getElementById('output');
-    if (element) element.value = ''; // clear browser cache
+    if (element) element.value = '';
     return function(text) {
       if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-      // These replacements are necessary if you render to raw HTML
-      //text = text.replace(/&/g, "&amp;");
-      //text = text.replace(/</g, "&lt;");
-      //text = text.replace(/>/g, "&gt;");
-      //text = text.replace('\n', '<br>', 'g');
       console.log(text);
       if (element) {
         element.value += text + "\n";
@@ -73,10 +68,3 @@ window.onerror = function(event) {
     if (text) Module.printErr('[post-exception status] ' + text);
   };
 };
-
-
-//Module.ccall("step", [0]); // using ccall
-//step = Module.cwrap('step', null, ['number']);
-//step(0);
-
-//console.log(em_module._getCellStatus(1, 2)); // vdirect call
