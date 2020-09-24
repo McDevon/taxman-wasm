@@ -30,11 +30,14 @@ void platform_display_set_image(uint8_t *buffer)
     const uint8_t white[] = { 183, 182, 181 };
     const uint8_t black[] = { 14, 14, 13 };
 
+    const Uint32 sdl_white = SDL_MapRGBA(screen->format, white[0], white[1], white[2], 255);
+    const Uint32 sdl_black = SDL_MapRGBA(screen->format, black[0], black[1], black[2], 255);
+
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
-        const uint8_t *color = buffer[i] ? white : black;
+        const Uint32 *color = buffer[i] ? sdl_white : sdl_black;
         int x = i % SCREEN_WIDTH;
         int y = i / SCREEN_WIDTH;
-        *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = SDL_MapRGBA(screen->format, color[0], color[1], color[2], 255);
+        *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = color;
     }
     if (SDL_MUSTLOCK(screen)) {
         SDL_UnlockSurface(screen);

@@ -38,6 +38,7 @@ Then open a browser and head to [http://localhost:8000]()
 - Audio
 - Mobile support
 - Use proper assets instead of the hack with uncompressed binaries that is currently in use
+- Migrate to SDL2 if it can be made more performant than SDL1
 
 ## Contributing
 
