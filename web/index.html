@@ -13,7 +13,71 @@
 
       .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
       div.emscripten { text-align: center; }      
-      div.emscripten_border { border: 1px solid black; }
+      /* div.emscripten_border { border: 1px solid black; } */
+      div.canvas_border {
+        padding: 20px;
+        background-color: black;
+        border-radius: 10px;
+      }
+      div.console_box {
+        display: flex;
+      }
+      div.console_yellow {
+        border: 2px solid black;
+        padding: 20px;
+        background-color: #e7c254;
+        border-radius: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        display: inline-block;
+      }
+      div.console_controls {
+        height: 185px;
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        position: relative;
+      }
+      div.button {
+        background-image: url(/button_up.png);
+        height: 55px;
+        width: 55px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position-y: bottom;
+        display: inline-block;
+        position: absolute;
+        text-align: center;
+        font-size: 30px;
+        line-height: 45px;
+      }
+      #button_up {
+        left: 63px;
+        top: 0px;
+      }
+      #button_left {
+        left: 0px;
+        top: 62px;
+      }
+      #button_right {
+        left: 121px;
+        top: 62px;
+      }
+      #button_down {
+        left: 63px;
+        top: 120px;
+      }
+      #button_a {
+        left: 225px;
+        top: 10px;
+      }
+      #button_b {
+        left: 320px;
+        top: 10px;
+      }
+
+
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
       canvas.emscripten { border: 0px none; background-color: black; }
 
@@ -81,10 +145,10 @@
       }
 
       #controls {
-        float: right;
-        vertical-align: top;
-        margin-top: 30px;
+        display: block;
+        width: fit-content;
         margin-right: 20px;
+        margin-left: auto;
       }
 
       #output {
@@ -109,16 +173,29 @@
     <div class="spinner" id='spinner'></div>
     <div class="emscripten" id="status">Downloading...</div>
 
-<span id='controls'>
-  <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(false, false)">
-  </span>
-</span>
+    <div id='controls'>
+      <input type="button" value="Fullscreen" onclick="Module.requestFullscreen(false, false)">
+    </div>
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
 
     <div class="emscripten_border">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      <div class="console_box">
+        <div class="console_yellow">
+          <div class="canvas_border">
+            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+          </div>
+          <div class="console_controls">
+            <div class="button" id="button_up">↑</div>
+            <div class="button" id="button_left">←</div>
+            <div class="button" id="button_right">→</div>
+            <div class="button" id="button_down">↓</div>
+            <div class="button" id="button_a">A</div>
+            <div class="button" id="button_b">S</div>
+          </div>
+        </div>
+      </div>
     </div>
     <textarea id="output" rows="8"></textarea>
 

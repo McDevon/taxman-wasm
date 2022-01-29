@@ -57,6 +57,8 @@ ${OUT_DIR} ${OBJ_DIR}:
 $(OUT_DIR)/index.html: $(COPY_DIR)/index.html
 $(OUT_DIR)/loader.js: $(COPY_DIR)/loader.js
 $(OUT_DIR)/taxmanLib.js: $(COPY_DIR)/taxmanLib.js
+$(OUT_DIR)/button_up.png: $(COPY_DIR)/button_up.png
+$(OUT_DIR)/button_down.png: $(COPY_DIR)/button_down.png
 
 #-include $(OBJ:.o=.d)
 
