@@ -17,6 +17,11 @@ const registerKeys = () => {
     window.currentKeys.a = 0
     window.currentKeys.b = 0
     window.currentKeys.menu = 0
+    window.currentKeys.rotate_cw = 0
+    window.currentKeys.rotate_ccw = 0
+    window.currentKeys.increase_rot_speed = 0
+    window.currentKeys.decrease_rot_speed = 0
+    window.currentKeys.rot_speed = 150
 
     const animateKeyDown = (element) => {
         element.style.backgroundImage = "url(/button_down.png)";
@@ -52,6 +57,10 @@ const registerKeys = () => {
             animateKeyDown(document.getElementById("button_b"))
         } else if (e.keyCode == '76') {
             window.currentKeys.menu = 1
+        } else if (e.keyCode == '81') {
+            window.currentKeys.rotate_ccw = 1
+        } else if (e.keyCode == '87') {
+            window.currentKeys.rotate_cw = 1
         }
     }
     const keyUp = (e) => {
@@ -77,6 +86,10 @@ const registerKeys = () => {
             animateKeyUp(document.getElementById("button_b"))
         } else if (e.keyCode == '76') {
             window.currentKeys.menu = 0
+        } else if (e.keyCode == '81') {
+            window.currentKeys.rotate_ccw = 0
+        } else if (e.keyCode == '87') {
+            window.currentKeys.rotate_cw = 0
         }
     }
 
@@ -88,7 +101,7 @@ const startRender = () => {
 
     document.getElementById("output").style.display = "none"
 
-    var canvas = document.getElementById('canvas')
+    let canvas = document.getElementById('canvas')
 
     const ctx = canvas.getContext('2d')
 
@@ -102,7 +115,16 @@ const startRender = () => {
     let lastTime = (new Date()).getTime(),
         currentTime = 0,
         dt = 0,
-        skip = false
+        skip = false,
+        crank = 0.0
+    
+    const updateCrank = (crank) => {
+        if (crank > 360.0) { crank -= 360.0 }
+        if (crank < 0) { crank += 360.0 }
+        document.getElementById("crank_arm_container").style.transform = 'rotate(' + crank + 'deg)'
+        document.getElementById("crank_label_value").textContent = Number(crank).toFixed(1) + '°'
+        return crank
+    }
 
     const simulationLoop = () => {
         window.requestAnimationFrame(simulationLoop)
@@ -115,6 +137,15 @@ const startRender = () => {
         currentTime = (new Date()).getTime()
         dt = Math.min((currentTime - lastTime) / 1000, 0.03)
 
+        if (window.currentKeys.rotate_cw) {
+            crank += dt * window.currentKeys.rot_speed
+            crank = updateCrank(crank)
+        }
+        if (window.currentKeys.rotate_ccw) {
+            crank -= dt * window.currentKeys.rot_speed
+            crank = updateCrank(crank)
+        }
+
         step(
             dt,
             window.currentKeys.left,
@@ -123,7 +154,8 @@ const startRender = () => {
             window.currentKeys.down,
             window.currentKeys.a,
             window.currentKeys.b,
-            window.currentKeys.menu
+            window.currentKeys.menu,
+            crank
             );
 
         lastTime = currentTime
