@@ -10,7 +10,7 @@ typedef struct {
 
 void load_resources(LoadingScene *self)
 {
-    load_image_data("dither_blue", False, True);
+    load_image_data("dither_blue", false, true);
 }
 
 void loading_scene_update(GameObject *scene, Number dt_ms)
@@ -35,7 +35,7 @@ void loading_scene_initialize(GameObject *scene)
 {
     LoadingScene *self = (LoadingScene *)scene;
     
-    load_sprite_sheet("sprites", True);
+    load_sprite_sheet("sprites", true);
     
     const Float time_fall = 0.4f;
     const Float time_start = 0.25f;
@@ -53,7 +53,7 @@ void loading_scene_initialize(GameObject *scene)
         sprite->scale.y = nb_one;
         sprite->rotation = nb_zero;
 
-        sprite->rotate_and_scale = True;
+        sprite->rotate_and_scale = true;
         
         go_set_z_order(sprite, 1);
         
@@ -80,7 +80,7 @@ void loading_scene_initialize(GameObject *scene)
         sprite->scale.y = nb_from_float(start_scale);
         sprite->rotation = nb_zero;
 
-        sprite->rotate_and_scale = True;
+        sprite->rotate_and_scale = true;
         
         go_set_z_order(sprite, 1);
         
@@ -137,6 +137,7 @@ char *loading_scene_describe(void *scene)
 static GameObjectType LoadingSceneType = {
     { { "LoadingScene", &loading_scene_destroy, &loading_scene_describe } },
     &loading_scene_initialize,
+    NULL,
     &loading_scene_start,
     &loading_scene_update,
     &loading_scene_fixed_update,

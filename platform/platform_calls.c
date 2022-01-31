@@ -4,10 +4,13 @@
 #include <string.h>
 #include <SDL/SDL.h>
 #include "constants.h"
+#include "platform_adapter.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+
+extern void get_current_time();
 
 SDL_Surface *screen;
 
@@ -78,4 +81,19 @@ char *platform_strndup(const char *str, size_t size)
 void platform_free(void *ptr)
 {
     free(ptr);
+}
+
+platform_time_t platform_current_time()
+{
+    return (platform_time_t)(get_current_time());
+}
+
+float platform_time_to_seconds(platform_time_t time)
+{
+    return (float)(((double)time) / 1000000.0);
+}
+
+void platform_print(const char *text)
+{
+    printf("%s", text);
 }

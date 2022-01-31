@@ -78,6 +78,7 @@ char *test_scene_describe(void *scene)
 static GameObjectType TestSceneType = {
     { { "TestScene", &test_scene_destroy, &test_scene_describe } },
     &test_scene_initialize,
+    NULL,
     &test_scene_start,
     &test_scene_update,
     &test_scene_fixed_update,

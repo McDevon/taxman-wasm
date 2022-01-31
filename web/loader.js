@@ -73,10 +73,3 @@ window.onerror = function(event) {
     if (text) Module.printErr('[post-exception status] ' + text);
   };
 };
-
-
-//Module.ccall("step", [0]); // using ccall
-//step = Module.cwrap('step', null, ['number']);
-//step(0);
-
-//console.log(em_module._getCellStatus(1, 2)); // vdirect call

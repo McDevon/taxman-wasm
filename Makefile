@@ -33,8 +33,10 @@ CSRC = $(wildcard platform/*.c) \
        $(wildcard taxman-engine/Engine/Resources/*.c) \
        $(wildcard taxman-engine/Engine/Scene/*.c) \
        $(wildcard taxman-engine/Engine/Strings/*.c) \
+       $(wildcard taxman-engine/Engine/Tests/*.c) \
        $(wildcard taxman-engine/Engine/Utils/*.c) \
        $(wildcard taxman-engine/Tools/Camera/*.c) \
+       $(wildcard taxman-engine/Tools/Components/*.c) \
        $(wildcard taxman-engine/Tools/Physics/*.c) \
        $(wildcard taxman-engine/Tools/Tilemap/*.c) \
        $(wildcard game/*.c) \

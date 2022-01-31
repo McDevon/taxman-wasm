@@ -35,8 +35,6 @@ const registerKeys = () => {
     const keyDown = (e) => {
         e = e || window.event
 
-        console.log(e.keyCode);
-
         if (e.keyCode == '37') {
             window.currentKeys.left = 1
             animateKeyDown(document.getElementById("button_left"))
@@ -110,8 +108,7 @@ const startRender = () => {
 
     vendorCheck()
 
-    step = Module.cwrap('step', null, ['number'])
-
+    step = Module.cwrap('step', null, ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number'])
     let lastTime = (new Date()).getTime(),
         currentTime = 0,
         dt = 0,
@@ -156,7 +153,7 @@ const startRender = () => {
             window.currentKeys.b,
             window.currentKeys.menu,
             crank
-            );
+        )
 
         lastTime = currentTime
     }
@@ -168,5 +165,8 @@ if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
     start: function() {
         registerKeys()
         startRender()
+    },
+    get_current_time: function() {
+        return Date.now()
     }
 });
