@@ -1,5 +1,5 @@
 CC=emcc
-CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
+CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString"]' \
        -s EXPORTED_FUNCTIONS='["_main"]' \
 	   -fsanitize=undefined \
 	   --js-library web/taxmanLib.js \

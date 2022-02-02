@@ -161,6 +161,39 @@ const startRender = () => {
     simulationLoop()
 }
 
+async function getTextFile(fileName) {
+	let response = await fetch('/' + 'sprites.txt') // + UTF8ToString(fileName))
+
+	if(response.status != 200) {
+		throw new Error("Server Error")
+	}
+	let textData = await response.text()
+
+    Module.ccall('read_text_callback', null, ['string', 'string'], [allocate(intArrayFromString(fileName), ALLOC_NORMAL), allocate(intArrayFromString(textData), ALLOC_NORMAL)])
+}
+
+/*function getTextFile(fileName) {
+    var request = new XMLHttpRequest()
+    request.open('GET', '/' + "sprites.txt", true) //UTF8ToString(fileName)
+    request.send(null)
+    request.onreadystatechange = function () {
+        if (request.readyState === 4 && request.status === 200) {
+            var type = request.getResponseHeader('Content-Type')
+            if (type.indexOf("text") !== 1) {
+                return allocate(intArrayFromString(request.responseText), 'i8', ALLOC_NORMAL)
+            } else {
+                return allocate(intArrayFromString(""), 'i8', ALLOC_NORMAL)
+            }
+        } else {
+            return allocate(intArrayFromString(""), 'i8', ALLOC_NORMAL)
+        }
+    }
+}*/
+
+function freeText(text) {
+    _free(text)
+}
+
 if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
     start: function() {
         registerKeys()
@@ -168,5 +201,11 @@ if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
     },
     get_current_time: function() {
         return Date.now()
+    },
+    get_text_file: function(fileName) {
+        getTextFile(fileName)
+    },
+    close_text_file: function(file) {
+        return freeText(file)
     }
 });

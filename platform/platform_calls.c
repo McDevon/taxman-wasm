@@ -10,7 +10,12 @@
 #include <emscripten.h>
 #endif
 
-extern void get_current_time();
+extern double get_current_time();
+extern void get_text_file(const char *file_name);
+extern void close_text_file(const char *file_data);
+
+static bool text_loaded = false;
+static char * loaded_text = NULL;
 
 SDL_Surface *screen;
 
@@ -96,4 +101,27 @@ float platform_time_to_seconds(platform_time_t time)
 void platform_print(const char *text)
 {
     printf("%s", text);
+}
+
+/*char *platform_read_text_file(const char *file_path)
+{
+    text_loaded = false;
+    get_text_file(file_path);
+
+    while (!text_loaded) {}
+
+    char *value = loaded_text;
+    loaded_text = NULL;
+    return value;
+}*/
+
+EMSCRIPTEN_KEEPALIVE
+void read_text_callback(char *text)
+{
+    loaded_text = text;
+    text_loaded = true;
+}
+
+void platform_close_text_file(char *file_data) {
+    close_text_file(file_data);
 }
