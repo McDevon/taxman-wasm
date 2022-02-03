@@ -7,9 +7,10 @@
 typedef struct {
     GAME_OBJECT;
     HashTable *assets_in_waiting;
+    bool initialized;
 } LoadingScene;
 
-void loading_scene_run(LoadingScene *);
+void loading_scene_run(LoadingScene *self);
 
 void loading_scene_asset_loaded_callback(const char *asset_name, bool success, void *context)
 {
@@ -18,9 +19,6 @@ void loading_scene_asset_loaded_callback(const char *asset_name, bool success, v
     int result = hashtable_remove(self->assets_in_waiting, asset_name);
     if (result) {
         LOG("Asset name not found: %s", asset_name);
-    }
-    if (hashtable_count(self->assets_in_waiting) == 0) {
-        loading_scene_run(self);
     }
 }
 
@@ -109,6 +107,11 @@ void loading_scene_initialize(GameObject *scene)
 
 void loading_scene_update(GameObject *scene, Number dt_ms)
 {
+    LoadingScene *self = (LoadingScene *)scene;
+    if (!self->initialized && hashtable_count(self->assets_in_waiting) == 0) {
+        loading_scene_run(self);
+        self->initialized = true;
+    }
 }
 
 void loading_scene_fixed_update(GameObject *scene, Number dt_ms)
@@ -242,6 +245,7 @@ GameObject *loading_scene_create()
     
     p_scene->w_type = &LoadingSceneType;
     p_scene->assets_in_waiting = hashtable_create();
+    p_scene->initialized = false;
     
     return (GameObject *)p_scene;
 }

@@ -161,34 +161,37 @@ const startRender = () => {
     simulationLoop()
 }
 
-async function getTextFile(fileName) {
-	let response = await fetch('/' + 'sprites.txt') // + UTF8ToString(fileName))
+async function getTextFile(utf8FileName, callback, context) {
+    let fileName = UTF8ToString(utf8FileName)
+	let response = await fetch('/' + fileName)
 
 	if(response.status != 200) {
 		throw new Error("Server Error")
 	}
 	let textData = await response.text()
 
-    Module.ccall('read_text_callback', null, ['string', 'string'], [allocate(intArrayFromString(fileName), ALLOC_NORMAL), allocate(intArrayFromString(textData), ALLOC_NORMAL)])
-}
+    let fileNameLen = lengthBytesUTF8(fileName) + 1;
+    let fileNamePtr = _malloc(fileNameLen);
+    stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+    let textDataLen = lengthBytesUTF8(textData) + 1;
+    let textDataPtr = _malloc(textDataLen);
+    stringToUTF8Array(textData, HEAP8, textDataPtr, textDataLen);
 
-/*function getTextFile(fileName) {
-    var request = new XMLHttpRequest()
-    request.open('GET', '/' + "sprites.txt", true) //UTF8ToString(fileName)
-    request.send(null)
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200) {
-            var type = request.getResponseHeader('Content-Type')
-            if (type.indexOf("text") !== 1) {
-                return allocate(intArrayFromString(request.responseText), 'i8', ALLOC_NORMAL)
-            } else {
-                return allocate(intArrayFromString(""), 'i8', ALLOC_NORMAL)
-            }
-        } else {
-            return allocate(intArrayFromString(""), 'i8', ALLOC_NORMAL)
-        }
-    }
-}*/
+    console.log('file: ' + fileName)
+    Module.ccall('read_text_callback',
+        null,
+        ['number', 'number', 'number', 'number'],
+        [
+            fileNamePtr,
+            textDataPtr,
+            callback,
+            context
+        ]
+    )
+
+    _free(fileNamePtr)
+    _free(textDataPtr)
+}
 
 function freeText(text) {
     _free(text)
@@ -202,10 +205,10 @@ if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
     get_current_time: function() {
         return Date.now()
     },
-    get_text_file: function(fileName) {
-        getTextFile(fileName)
+    get_text_file: function(fileName, callback, context) {
+        getTextFile(fileName, callback, context)
     },
-    close_text_file: function(file) {
-        return freeText(file)
+    log_in_js: function(text) {
+        console.log(UTF8ToString(text))
     }
 });

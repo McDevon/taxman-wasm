@@ -1,6 +1,6 @@
 CC=emcc
-CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString"]' \
-       -s EXPORTED_FUNCTIONS='["_main"]' \
+CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString", "stackSave", "stackAlloc", "stackRestore"]' \
+       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback"]' \
 	   -fsanitize=undefined \
 	   --js-library web/taxmanLib.js \
 	   -I taxman-engine/Engine/Actions/ \

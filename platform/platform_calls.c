@@ -11,8 +11,8 @@
 #endif
 
 extern double get_current_time();
-extern void get_text_file(const char *file_name);
-extern void close_text_file(const char *file_data);
+extern void get_text_file(const char *, load_text_data_callback_t *, void *);
+extern void log_in_js(const char *);
 
 static bool text_loaded = false;
 static char * loaded_text = NULL;
@@ -103,25 +103,16 @@ void platform_print(const char *text)
     printf("%s", text);
 }
 
-/*char *platform_read_text_file(const char *file_path)
+void platform_read_text_file(const char *file_path, load_text_data_callback_t *callback, void *context)
 {
-    text_loaded = false;
-    get_text_file(file_path);
-
-    while (!text_loaded) {}
-
-    char *value = loaded_text;
-    loaded_text = NULL;
-    return value;
-}*/
-
-EMSCRIPTEN_KEEPALIVE
-void read_text_callback(char *text)
-{
-    loaded_text = text;
-    text_loaded = true;
+    get_text_file(file_path, callback, context);
 }
 
-void platform_close_text_file(char *file_data) {
-    close_text_file(file_data);
+EMSCRIPTEN_KEEPALIVE
+void read_text_callback(const char *file_path, const char *text_data, load_text_data_callback_t *callback, void *context)
+{
+    log_in_js("Got text file ");
+    log_in_js(file_path);
+    log_in_js(text_data);
+    callback(file_path, text_data, context);
 }
