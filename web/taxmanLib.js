@@ -21,7 +21,8 @@ const registerKeys = () => {
     window.currentKeys.rotate_ccw = 0
     window.currentKeys.increase_rot_speed = 0
     window.currentKeys.decrease_rot_speed = 0
-    window.currentKeys.rot_speed = 150
+    window.currentKeys.rot_speed = 100
+    window.currentKeys.rot_speed_change_speed = 200
 
     const animateKeyDown = (element) => {
         element.style.backgroundImage = "url(/button_down.png)";
@@ -59,8 +60,12 @@ const registerKeys = () => {
             window.currentKeys.rotate_ccw = 1
         } else if (e.keyCode == '87') {
             window.currentKeys.rotate_cw = 1
+        } else if (e.keyCode == '69') {
+            window.currentKeys.increase_rot_speed = 1
+        } else if (e.keyCode == '68') {
+            window.currentKeys.decrease_rot_speed = 1
         }
-    }
+}
     const keyUp = (e) => {
         e = e || window.event
 
@@ -88,6 +93,10 @@ const registerKeys = () => {
             window.currentKeys.rotate_ccw = 0
         } else if (e.keyCode == '87') {
             window.currentKeys.rotate_cw = 0
+        } else if (e.keyCode == '69') {
+            window.currentKeys.increase_rot_speed = 0
+        } else if (e.keyCode == '68') {
+            window.currentKeys.decrease_rot_speed = 0
         }
     }
 
@@ -123,6 +132,13 @@ const startRender = () => {
         return crank
     }
 
+    const updateCrankSpeed = (crankSpeed) => {
+        if (crankSpeed > 800.0) { crankSpeed = 800.0 }
+        if (crankSpeed < 0.0) { crankSpeed = 0.0 }
+        document.getElementById("crank_speed_label_value").textContent = Number(crankSpeed).toFixed(0) + '°/s'
+        return crankSpeed
+    }
+
     const simulationLoop = () => {
         window.requestAnimationFrame(simulationLoop)
 
@@ -132,7 +148,7 @@ const startRender = () => {
         }
 
         currentTime = (new Date()).getTime()
-        dt = Math.min((currentTime - lastTime) / 1000, 0.03)
+        dt = Math.min((currentTime - lastTime) / 1000, 0.1)
 
         if (window.currentKeys.rotate_cw) {
             crank += dt * window.currentKeys.rot_speed
@@ -141,6 +157,14 @@ const startRender = () => {
         if (window.currentKeys.rotate_ccw) {
             crank -= dt * window.currentKeys.rot_speed
             crank = updateCrank(crank)
+        }
+        if (window.currentKeys.increase_rot_speed) {
+            window.currentKeys.rot_speed += dt * window.currentKeys.rot_speed_change_speed
+            window.currentKeys.rot_speed = updateCrankSpeed(window.currentKeys.rot_speed)
+        }
+        if (window.currentKeys.decrease_rot_speed) {
+            window.currentKeys.rot_speed -= dt * window.currentKeys.rot_speed_change_speed
+            window.currentKeys.rot_speed = updateCrankSpeed(window.currentKeys.rot_speed)
         }
 
         step(

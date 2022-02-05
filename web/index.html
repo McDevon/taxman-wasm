@@ -93,6 +93,11 @@
         font-size: 12px;
         position: absolute;
       }
+      div.crank_speed_control_label {
+        color: #333;
+        font-size: 12px;
+        position: absolute;
+      }
       #button_up {
         left: 63px;
         top: 0px;
@@ -139,6 +144,25 @@
       #crank_arm_container {
         width: 100%;
         height: 100%;
+      }
+      #crank_speed_label_up {
+        left: 90px;
+        top: 15px;
+        text-align: center;
+        width: 80px;
+      }
+      #crank_speed_label_down {
+        left: 90px;
+        top: auto;
+        bottom: 15px;
+        text-align: center;
+        width: 80px;
+     }
+      #crank_speed_label_value {
+        left: 90px;
+        top: 40px;
+        text-align: center;
+        width: 80px;
       }
 
 
@@ -263,6 +287,9 @@
             <div id="crank_arm_container">
               <div class="crank_arm"></div>
             </div>
+            <div class="crank_speed_control_label" id="crank_speed_label_up">↑ E</div>
+            <div class="crank_speed_control_label" id="crank_speed_label_down">↓ D</div>
+            <div class="crank_speed_control_label" id="crank_speed_label_value">100°/s</div>
           </div>
         </div>
       </div>
