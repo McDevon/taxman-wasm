@@ -25,11 +25,11 @@ const registerKeys = () => {
     window.currentKeys.rot_speed_change_speed = 200
 
     const animateKeyDown = (element) => {
-        element.style.backgroundImage = "url(/button_down.png)";
+        element.style.backgroundImage = "url(./button_down.png)";
         element.style.lineHeight = '55px';
     }
     const animateKeyUp = (element) => {
-        element.style.backgroundImage = "url(/button_up.png)";
+        element.style.backgroundImage = "url(./button_up.png)";
         element.style.lineHeight = '45px';
     }
 
