@@ -36,6 +36,8 @@ const registerKeys = () => {
     const keyDown = (e) => {
         e = e || window.event
 
+        console.log(e.keyCode)
+
         if (e.keyCode == '37') {
             window.currentKeys.left = 1
             animateKeyDown(document.getElementById("button_left"))
@@ -48,21 +50,22 @@ const registerKeys = () => {
         } else if (e.keyCode == '40') {
             window.currentKeys.down = 1
             animateKeyDown(document.getElementById("button_down"))
-        } else if (e.keyCode == '83') {
+        } else if (e.keyCode == '88') {
             window.currentKeys.a = 1
             animateKeyDown(document.getElementById("button_a"))
-        } else if (e.keyCode == '65') {
+        } else if (e.keyCode == '90') {
             window.currentKeys.b = 1
             animateKeyDown(document.getElementById("button_b"))
-        } else if (e.keyCode == '76') {
-            window.currentKeys.menu = 1
-        } else if (e.keyCode == '81') {
-            window.currentKeys.rotate_ccw = 1
-        } else if (e.keyCode == '87') {
-            window.currentKeys.rotate_cw = 1
         } else if (e.keyCode == '69') {
-            window.currentKeys.increase_rot_speed = 1
+            window.currentKeys.menu = 1
+            animateKeyDown(document.getElementById("button_menu"))
+        } else if (e.keyCode == '65') {
+            window.currentKeys.rotate_ccw = 1
         } else if (e.keyCode == '68') {
+            window.currentKeys.rotate_cw = 1
+        } else if (e.keyCode == '87') {
+            window.currentKeys.increase_rot_speed = 1
+        } else if (e.keyCode == '83') {
             window.currentKeys.decrease_rot_speed = 1
         }
 }
@@ -81,21 +84,22 @@ const registerKeys = () => {
         } else if (e.keyCode == '40') {
             window.currentKeys.down = 0
             animateKeyUp(document.getElementById("button_down"))
-        } else if (e.keyCode == '83') {
+        } else if (e.keyCode == '88') {
             window.currentKeys.a = 0
             animateKeyUp(document.getElementById("button_a"))
-        } else if (e.keyCode == '65') {
+        } else if (e.keyCode == '90') {
             window.currentKeys.b = 0
             animateKeyUp(document.getElementById("button_b"))
-        } else if (e.keyCode == '76') {
-            window.currentKeys.menu = 0
-        } else if (e.keyCode == '81') {
-            window.currentKeys.rotate_ccw = 0
-        } else if (e.keyCode == '87') {
-            window.currentKeys.rotate_cw = 0
         } else if (e.keyCode == '69') {
-            window.currentKeys.increase_rot_speed = 0
+            window.currentKeys.menu = 0
+            animateKeyUp(document.getElementById("button_menu"))
+        } else if (e.keyCode == '65') {
+            window.currentKeys.rotate_ccw = 0
         } else if (e.keyCode == '68') {
+            window.currentKeys.rotate_cw = 0
+        } else if (e.keyCode == '87') {
+            window.currentKeys.increase_rot_speed = 0
+        } else if (e.keyCode == '83') {
             window.currentKeys.decrease_rot_speed = 0
         }
     }
