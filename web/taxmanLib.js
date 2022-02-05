@@ -187,7 +187,7 @@ const startRender = () => {
 
 async function getTextFile(utf8FileName, callback, context) {
     let fileName = UTF8ToString(utf8FileName)
-	let response = await fetch('/' + fileName)
+	let response = await fetch('./' + fileName)
 
 	if(response.status != 200) {
 		throw new Error("Server Error")
@@ -283,7 +283,7 @@ const renderImage = (canvas, blob, fileName, callback, context) => {
 
 async function getImageFile(utf8FileName, callback, context) {
     let fileName = UTF8ToString(utf8FileName)
-	let response = await fetch('/' + fileName.replace(/\.[^/.]+$/, "") + ".png")
+	let response = await fetch('./' + fileName.replace(/\.[^/.]+$/, "") + ".png")
 
 	if(response.status != 200) {
 		throw new Error("Server Error")
