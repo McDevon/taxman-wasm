@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Taxman Demo</title>
+    <style>
+      body {
+        font-family: arial;
+        margin: 0;
+        padding: none;
+      }
+
+      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      div.emscripten { text-align: center; }      
+      div.canvas_border {
+        padding: 20px;
+        background-color: black;
+        border-radius: 10px;
+      }
+      div.console_box {
+        display: flex;
+      }
+      div.console_yellow {
+        border: 2px solid black;
+        padding: 10px;
+        background-color: #e7c254;
+        border-radius: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        display: inline-block;
+      }
+      div.console_controls {
+        height: 185px;
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        position: relative;
+      }
+      div.button {
+        background-image: url(/button_up.png);
+        height: 55px;
+        width: 55px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position-y: bottom;
+        display: inline-block;
+        position: absolute;
+        text-align: center;
+        font-size: 30px;
+        line-height: 45px;
+      }
+      div.crank {
+        width: 90px;
+        height: 90px;
+        position: absolute;
+        border-radius: 50%;
+        background-color: white;
+      }
+      div.crank::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: black;
+        position: absolute;
+        left: 42px;
+        top: 42px;
+      }
+      div.crank_arm {
+        content: "";
+        width: 2px;
+        height: 36px;
+        background-color: black;
+        position: absolute;
+        left: 44px;
+        top: 9px;
+      }
+      div.crank_arm::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: white;
+        border: 3px solid black;
+        position: absolute;
+        left: -5px;
+        top: -6.5px;
+      }
+      div.crank_label {
+        color: #aaa;
+        font-size: 12px;
+        position: absolute;
+      }
+      div.crank_speed_control_label {
+        color: #333;
+        font-size: 12px;
+        position: absolute;
+      }
+      #button_up {
+        left: 63px;
+        top: 0px;
+      }
+      #button_left {
+        left: 0px;
+        top: 62px;
+      }
+      #button_right {
+        left: 121px;
+        top: 62px;
+      }
+      #button_down {
+        left: 63px;
+        top: 120px;
+      }
+      #button_a {
+        left: 320px;
+        top: 120px;
+      }
+      #button_b {
+        left: 225px;
+        top: 120px;
+      }
+      #crank {
+        left: 255px;
+        top: 5px;
+      }
+      #crank_label_left {
+        left: 20px;
+        top: 10px;
+      }
+      #crank_label_right {
+        right: 20px;
+        left: auto;
+        top: 10px;
+      }
+      #crank_label_value {
+        left: 3px;
+        top: 70px;
+        text-align: center;
+        width: 100%;
+      }
+      #crank_arm_container {
+        width: 100%;
+        height: 100%;
+      }
+      #crank_speed_label_up {
+        left: 90px;
+        top: 15px;
+        text-align: center;
+        width: 80px;
+      }
+      #crank_speed_label_down {
+        left: 90px;
+        top: auto;
+        bottom: 15px;
+        text-align: center;
+        width: 80px;
+     }
+      #crank_speed_label_value {
+        left: 90px;
+        top: 40px;
+        text-align: center;
+        width: 80px;
+      }
+
+
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten { border: 0px none; background-color: black; }
+
+      canvas {
+          image-rendering: optimizeSpeed;             /* Older versions of FF          */
+          image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+          image-rendering: -webkit-optimize-contrast; /* Safari                        */
+          image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+          image-rendering: pixelated;                 /* Awesome future-browsers       */
+          -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+      }
+
+      .spinner {
+        height: 30px;
+        width: 30px;
+        margin: 0;
+        margin-top: 20px;
+        margin-left: 20px;
+        display: inline-block;
+        vertical-align: top;
+
+        -webkit-animation: rotation .8s linear infinite;
+        -moz-animation: rotation .8s linear infinite;
+        -o-animation: rotation .8s linear infinite;
+        animation: rotation 0.8s linear infinite;
+
+        border-left: 5px solid rgb(235, 235, 235);
+        border-right: 5px solid rgb(235, 235, 235);
+        border-bottom: 5px solid rgb(235, 235, 235);
+        border-top: 5px solid rgb(120, 120, 120);
+        
+        border-radius: 100%;
+        background-color: rgb(189, 215, 46);
+      }
+
+      @-webkit-keyframes rotation {
+        from {-webkit-transform: rotate(0deg);}
+        to {-webkit-transform: rotate(360deg);}
+      }
+      @-moz-keyframes rotation {
+        from {-moz-transform: rotate(0deg);}
+        to {-moz-transform: rotate(360deg);}
+      }
+      @-o-keyframes rotation {
+        from {-o-transform: rotate(0deg);}
+        to {-o-transform: rotate(360deg);}
+      }
+      @keyframes rotation {
+        from {transform: rotate(0deg);}
+        to {transform: rotate(360deg);}
+      }
+
+      #status {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 30px;
+        margin-left: 20px;
+        font-weight: bold;
+        color: rgb(120, 120, 120);
+      }
+
+      #progress {
+        height: 20px;
+        width: 300px;
+      }
+
+      #controls {
+        display: block;
+        width: fit-content;
+        margin-right: 20px;
+        margin-left: auto;
+      }
+
+      #output {
+        width: 100%;
+        height: 200px;
+        margin: 0 auto;
+        margin-top: 10px;
+        border-left: 0px;
+        border-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        display: block;
+        background-color: black;
+        color: white;
+        font-family: 'Lucida Console', Monaco, monospace;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="spinner" id='spinner'></div>
+    <div class="emscripten" id="status">Downloading...</div>
+
+    <div id='controls'>
+      <input type="button" value="Fullscreen" onclick="Module.requestFullscreen(false, false)">
+    </div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+
+    <div class="console_box">
+      <div class="console_yellow">
+        <div class="canvas_border">
+          <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+        </div>
+        <div class="console_controls">
+          <div class="button" id="button_up">↑</div>
+          <div class="button" id="button_left">←</div>
+          <div class="button" id="button_right">→</div>
+          <div class="button" id="button_down">↓</div>
+          <div class="button" id="button_b">A</div>
+          <div class="button" id="button_a">S</div>
+          <div class="crank" id="crank">
+            <div class="crank_label" id="crank_label_left">Q</div>
+            <div class="crank_label" id="crank_label_right">W</div>
+            <div class="crank_label" id="crank_label_value">0.0°</div>
+            <div id="crank_arm_container">
+              <div class="crank_arm"></div>
+            </div>
+            <div class="crank_speed_control_label" id="crank_speed_label_up">↑ E</div>
+            <div class="crank_speed_control_label" id="crank_speed_label_down">↓ D</div>
+            <div class="crank_speed_control_label" id="crank_speed_label_value">100°/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <textarea id="output" rows="8"></textarea>
+
+    <script type='text/javascript' src="loader.js"></script>
+    <script async type="text/javascript" src="core.js"></script>
+    <script async type="text/javascript" src="taxmanLib.js"></script>
+  </body>
+</html>
+
+
