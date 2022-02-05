@@ -1,6 +1,9 @@
 #include "loading_scene.h"
 #include "engine.h"
 #include "test_scene.h"
+#include "gecko_scene.h"
+#include "game_data.h"
+#include "tilemap.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -22,30 +25,37 @@ void loading_scene_asset_loaded_callback(const char *asset_name, bool success, v
     }
 }
 
-void start_after_loading(LoadingScene *self,
-                         const char **images_noalpha,
-                         const size_t images_noalpha_count,
-                         const char **sprite_sheets_noalpha,
-                         const size_t sprite_sheets_noalpha_count,
-                         const char **sprite_sheets_alpha,
-                         const size_t sprite_sheets_alpha_count,
-                         const char **grid_atlases_alpha,
-                         const Size2DInt *grid_atlases_alpha_sizes,
-                         const size_t grid_atlases_alpha_count,
-                         const char **tile_types,
-                         const size_t tile_types_count) {
-    
+void load_resources(LoadingScene *self)
+{   
+    GameData *data = game_data_create();
+    go_get_scene_manager(self)->data = data;
+
+    const char *images_noalpha[] = {"dither_blue"};
+    const char *images_alpha[] = {"sprites"};
+    const char *sprite_sheets_noalpha[] = {};
+    const char *sprite_sheets_alpha[] = {"sprites", "gecko"};
+    const char *tile_types[] = {};
+    const char *grid_atlases_alpha[] = {"font_big_2"};
+    const Size2DInt grid_atlases_alpha_sizes[] = {(Size2DInt){ 16, 28 }, (Size2DInt){ 16, 28 }, (Size2DInt){ 8, 16 }, (Size2DInt){ 8, 8 }, (Size2DInt){ 8, 14 }};
+
+    const size_t images_noalpha_count = sizeof(images_noalpha) / sizeof(char *);
+    const size_t images_alpha_count = sizeof(images_alpha) / sizeof(char *);
+    const size_t sprite_sheets_noalpha_count = sizeof(sprite_sheets_noalpha) / sizeof(char *);
+    const size_t sprite_sheets_alpha_count = sizeof(sprite_sheets_alpha) / sizeof(char *);
+    const size_t grid_atlases_alpha_count = sizeof(grid_atlases_alpha) / sizeof(char *);
+    const size_t tile_types_count = sizeof(tile_types) / sizeof(char *);
+
     for (int i = 0; i < images_noalpha_count; ++i) {
         hashtable_put(self->assets_in_waiting, images_noalpha[i], NULL);
+    }
+    for (int i = 0; i < images_alpha_count; ++i) {
+        hashtable_put(self->assets_in_waiting, images_alpha[i], NULL);
     }
     for (int i = 0; i < sprite_sheets_noalpha_count; ++i) {
         hashtable_put(self->assets_in_waiting, sprite_sheets_noalpha[i], NULL);
     }
     for (int i = 0; i < sprite_sheets_alpha_count; ++i) {
         hashtable_put(self->assets_in_waiting, sprite_sheets_alpha[i], NULL);
-    }
-    for (int i = 0; i < grid_atlases_alpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, grid_atlases_alpha[i], NULL);
     }
     for (int i = 0; i < grid_atlases_alpha_count; ++i) {
         hashtable_put(self->assets_in_waiting, grid_atlases_alpha[i], NULL);
@@ -59,6 +69,9 @@ void start_after_loading(LoadingScene *self,
     for (int i = 0; i < images_noalpha_count; ++i) {
         load_image_data(images_noalpha[i], false, true, &loading_scene_asset_loaded_callback, self);
     }
+    for (int i = 0; i < images_alpha_count; ++i) {
+        load_image_data(images_alpha[i], true, true, &loading_scene_asset_loaded_callback, self);
+    }
     for (int i = 0; i < sprite_sheets_noalpha_count; ++i) {
         load_sprite_sheet(sprite_sheets_noalpha[i], false, &loading_scene_asset_loaded_callback, self);
     }
@@ -68,37 +81,9 @@ void start_after_loading(LoadingScene *self,
     for (int i = 0; i < grid_atlases_alpha_count; ++i) {
         load_grid_atlas(grid_atlases_alpha[i], true, grid_atlases_alpha_sizes[i], &loading_scene_asset_loaded_callback, self);
     }
-    /*GameData *data = go_get_scene_manager(self)->data;
     for (int i = 0; i < tile_types_count; ++i) {
         load_tile_types(tile_types[i], data->tile_dictionary, &loading_scene_asset_loaded_callback, self);
-    }*/
-}
-
-void load_resources(LoadingScene *self)
-{
-    //GameData *data = game_data_create();
-    //go_get_scene_manager(self)->data = data;
-    
-    const char *images_noalpha[] = {"dither_blue"};
-    const char *sprite_sheets_noalpha[] = {};
-    const char *sprite_sheets_alpha[] = {"sprites", "gecko"};
-    const char *grid_atlases_alpha[] = {/*"font_big_1", "font_big_2", "font", "font2", "font4"*/};
-    const Size2DInt grid_atlases_alpha_sizes[] = {(Size2DInt){ 16, 28 }, (Size2DInt){ 16, 28 }, (Size2DInt){ 8, 16 }, (Size2DInt){ 8, 8 }, (Size2DInt){ 8, 14 }};
-    const char *tile_types[] = {};
-
-    start_after_loading(self,
-                        images_noalpha,
-                        sizeof(images_noalpha) / sizeof(char *),
-                        sprite_sheets_noalpha,
-                        sizeof(sprite_sheets_noalpha) / sizeof(char *),
-                        sprite_sheets_alpha,
-                        sizeof(sprite_sheets_alpha) / sizeof(char *),
-                        grid_atlases_alpha,
-                        grid_atlases_alpha_sizes,
-                        sizeof(grid_atlases_alpha) / sizeof(char *),
-                        tile_types,
-                        sizeof(tile_types) / sizeof(char *)
-    );
+    }
 }
 
 void loading_scene_initialize(GameObject *scene)
@@ -125,7 +110,8 @@ void loading_scene_render(GameObject *scene, RenderContext *ctx)
 
 void endcall(void *go, void *unused)
 {
-    scene_change(go_get_scene_manager(go), test_scene_create(), st_fade_black, nb_from_double(800.0));
+    //scene_change(go_get_scene_manager(go), test_scene_create(), st_fade_black, nb_from_double(800.0));
+    scene_change(go_get_scene_manager(go), gecko_scene_create(), st_fade_black, nb_from_double(800.0));
 }
 
 void loading_scene_run(LoadingScene *self)

@@ -12,6 +12,7 @@
 
 extern double get_current_time();
 extern void get_text_file(const char *, load_text_data_callback_t *, void *);
+extern void get_image_file(const char *, load_image_data_callback_t *, void *);
 extern void log_in_js(const char *);
 
 static bool text_loaded = false;
@@ -100,7 +101,7 @@ float platform_time_to_seconds(platform_time_t time)
 
 void platform_print(const char *text)
 {
-    printf("%s", text);
+    log_in_js(text);
 }
 
 void platform_read_text_file(const char *file_path, load_text_data_callback_t *callback, void *context)
@@ -108,11 +109,19 @@ void platform_read_text_file(const char *file_path, load_text_data_callback_t *c
     get_text_file(file_path, callback, context);
 }
 
+void platform_load_image(const char *file_path, load_image_data_callback_t *callback, void *context)
+{
+    get_image_file(file_path, callback, context);
+}
+
 EMSCRIPTEN_KEEPALIVE
 void read_text_callback(const char *file_path, const char *text_data, load_text_data_callback_t *callback, void *context)
 {
-    log_in_js("Got text file ");
-    log_in_js(file_path);
-    log_in_js(text_data);
     callback(file_path, text_data, context);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void read_image_callback(const char *file_path, const uint32_t width, const uint32_t height, const bool alpha, const uint8_t *image_data, load_image_data_callback_t *callback, void *context)
+{
+    callback(file_path, width, height, alpha, image_data, context);
 }

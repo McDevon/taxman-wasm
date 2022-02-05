@@ -177,7 +177,6 @@ async function getTextFile(utf8FileName, callback, context) {
     let textDataPtr = _malloc(textDataLen);
     stringToUTF8Array(textData, HEAP8, textDataPtr, textDataLen);
 
-    console.log('file: ' + fileName)
     Module.ccall('read_text_callback',
         null,
         ['number', 'number', 'number', 'number'],
@@ -193,8 +192,81 @@ async function getTextFile(utf8FileName, callback, context) {
     _free(textDataPtr)
 }
 
-function freeText(text) {
-    _free(text)
+const returnImage = (image, canvas, fileName, callback, context) => {
+    let size = image.width * image.height
+    let pixelData = canvas.getContext('2d').getImageData(0, 0, image.width, image.height).data
+
+    let alpha = false;
+    for (var i = 3, n = pixelData.length; i < n; i+=4) {
+        if (pixelData[i] < 255) {
+            alpha = true;
+            break;
+        }
+    }
+
+    arraySize = alpha ? size * 2 : size
+
+    var dataPtr = _malloc(arraySize);
+    let array =  new Uint8Array(HEAPU8.buffer, dataPtr, arraySize)
+
+    if (alpha) {
+        for (let i = 0; i < size; i ++) {
+            array[i * 2] = pixelData[i * 4]
+            array[i * 2 + 1] = pixelData[i * 4 + 3]
+        }
+    } else {
+        for (let i = 0; i < size; i ++) {
+            array[i] = pixelData[i * 4]
+        }
+    }
+
+    let fileNameLen = lengthBytesUTF8(fileName) + 1;
+    let fileNamePtr = _malloc(fileNameLen);
+    stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+    Module.ccall('read_image_callback',
+        null,
+        ['number', 'number', 'number', 'number', 'number', 'number', 'number'],
+        [
+            fileNamePtr,
+            image.width,
+            image.height,
+            alpha,
+            dataPtr,
+            callback,
+            context
+        ]
+    )
+
+    _free(fileNamePtr)
+    _free(dataPtr)
+}
+
+const renderImage = (canvas, blob, fileName, callback, context) => {
+  
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+  
+    img.onload = function(){
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0)
+      returnImage(img, canvas, fileName, callback, context)
+    }
+  
+    img.src = URL.createObjectURL(blob);
+  };
+
+async function getImageFile(utf8FileName, callback, context) {
+    let fileName = UTF8ToString(utf8FileName)
+	let response = await fetch('/' + fileName.replace(/\.[^/.]+$/, "") + ".png")
+
+	if(response.status != 200) {
+		throw new Error("Server Error")
+	}
+	let image = await response.blob()
+    let canvas = document.createElement('canvas')
+    renderImage(canvas, image, fileName, callback, context)
 }
 
 if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
@@ -207,6 +279,9 @@ if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
     },
     get_text_file: function(fileName, callback, context) {
         getTextFile(fileName, callback, context)
+    },
+    get_image_file: function(fileName, callback, context) {
+        getImageFile(fileName, callback, context)
     },
     log_in_js: function(text) {
         console.log(UTF8ToString(text))

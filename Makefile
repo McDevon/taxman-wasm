@@ -1,6 +1,6 @@
 CC=emcc
 CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString", "stackSave", "stackAlloc", "stackRestore"]' \
-       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback"]' \
+       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback", "_read_image_callback"]' \
 	   -fsanitize=undefined \
 	   --js-library web/taxmanLib.js \
 	   -I taxman-engine/Engine/Actions/ \
@@ -16,12 +16,13 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intAr
 	   -I taxman-engine/Tools/Physics/ \
 	   -I taxman-engine/Tools/Tilemap/ \
 	   -I platform/ \
-	   -I game/
+	   -I game/ # -D DEBUG
 
 OUT_DIR=docs
 OBJ_DIR=obj
 SRC_DIR=platform
 COPY_DIR=web
+ASSETS_DIR=assets
 
 MKDIR_P=mkdir -p
 CSRC = $(wildcard platform/*.c) \
@@ -39,19 +40,21 @@ CSRC = $(wildcard platform/*.c) \
        $(wildcard taxman-engine/Tools/Components/*.c) \
        $(wildcard taxman-engine/Tools/Physics/*.c) \
        $(wildcard taxman-engine/Tools/Tilemap/*.c) \
-       $(wildcard game/*.c) \
-       $(wildcard assets/*.c)
+       $(wildcard game/*.c)
 OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 
-.PHONY: all clean directories
+.PHONY: all clean directories assets
 
-all: directories $(COPY_FILES) game
+all: directories $(COPY_FILES) game assets
 
 clean:
 	rm -rf ${OUT_DIR} ${OBJ_DIR} ${OBJ} *.o
 
 directories: ${OUT_DIR}
+
+assets:
+	cp ${ASSETS_DIR}/* ${OUT_DIR}/
 
 ${OUT_DIR} ${OBJ_DIR}:
 	${MKDIR_P} $@
