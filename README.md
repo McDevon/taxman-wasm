@@ -4,7 +4,7 @@ This is the [Taxman Engine](https://github.com/mcdevon/taxman-engine) running in
 
 The purpose of this project is to help me learn Wasm, as well as allow me to join game jams with [Playdate](http://play.date) games all the while allowing everyone to play even if they do not own the console.
 
-Online demo is [available here](https://mcdevon.github.io/taxman-wasm/). NOTE: the demo has a platformer scene, which is currently not part of this repository. This is due to the demo having a trademarked character. After a new character is added, the platformer scene with sources and assets will be made available here.
+Online demo is [available here](https://mcdevon.github.io/taxman-wasm/).
 
 ## Requirements
 
@@ -30,14 +30,14 @@ Then open a browser and head to [http://localhost:8000]()
 - Runs games built with Taxman Engine in browser
 - Rendering the display
 - Mapping of keys
+- Crank controls mapped to keys
+- Load asset files from server
+- Amazing console visualisation
 
 ## Rough Backlog
 
-- Add the platformer scene with non-trademarked assets to the repository
-- Add missing controls (at least crank & accelerometer)
 - Audio
 - Mobile support
-- Use proper assets instead of the hack with uncompressed binaries that is currently in use
 - Migrate to SDL2 if it can be made more performant than SDL1
 
 ## Contributing
