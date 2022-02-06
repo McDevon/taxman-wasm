@@ -60,6 +60,7 @@ ${OUT_DIR} ${OBJ_DIR}:
 	${MKDIR_P} $@
 
 $(OUT_DIR)/index.html: $(COPY_DIR)/index.html
+$(OUT_DIR)/taxman.css: $(COPY_DIR)/taxman.css
 $(OUT_DIR)/loader.js: $(COPY_DIR)/loader.js
 $(OUT_DIR)/taxmanLib.js: $(COPY_DIR)/taxmanLib.js
 $(OUT_DIR)/button_up.png: $(COPY_DIR)/button_up.png
