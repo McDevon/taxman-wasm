@@ -189,7 +189,7 @@ const startRender = () => {
     simulationLoop()
 }
 
-async function getTextFile(utf8FileName, callback, context) {
+const getTextFile = async (utf8FileName, callback, context) => {
     let fileName = UTF8ToString(utf8FileName)
 	let response = await fetch('./' + fileName)
 
@@ -270,12 +270,20 @@ const returnImage = (image, canvas, fileName, callback, context) => {
     _free(dataPtr)
 }
 
-const renderImage = (canvas, blob, fileName, callback, context) => {
-  
+const getImageFile = async (utf8FileName, callback, context) => {
+    let fileName = UTF8ToString(utf8FileName)
+	let response = await fetch('./' + fileName.replace(/\.[^/.]+$/, "") + ".png")
+
+	if(response.status != 200) {
+		throw new Error("Server Error")
+	}
+	let blob = await response.blob()
+    let canvas = document.createElement('canvas')
+
     var ctx = canvas.getContext('2d');
     var img = new Image();
   
-    img.onload = function(){
+    img.onload = () => {
       canvas.width = img.width
       canvas.height = img.height
       ctx.drawImage(img, 0, 0)
@@ -283,35 +291,23 @@ const renderImage = (canvas, blob, fileName, callback, context) => {
     }
   
     img.src = URL.createObjectURL(blob);
-  };
-
-async function getImageFile(utf8FileName, callback, context) {
-    let fileName = UTF8ToString(utf8FileName)
-	let response = await fetch('./' + fileName.replace(/\.[^/.]+$/, "") + ".png")
-
-	if(response.status != 200) {
-		throw new Error("Server Error")
-	}
-	let image = await response.blob()
-    let canvas = document.createElement('canvas')
-    renderImage(canvas, image, fileName, callback, context)
 }
 
 if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
-    start: function() {
+    start: () => {
         registerKeys()
         startRender()
     },
-    get_current_time: function() {
+    get_current_time: () => {
         return Date.now()
     },
-    get_text_file: function(fileName, callback, context) {
+    get_text_file: (fileName, callback, context) => {
         getTextFile(fileName, callback, context)
     },
-    get_image_file: function(fileName, callback, context) {
+    get_image_file: (fileName, callback, context) => {
         getImageFile(fileName, callback, context)
     },
-    log_in_js: function(text) {
+    log_in_js: (text) => {
         console.log(UTF8ToString(text))
     }
 });
