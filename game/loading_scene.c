@@ -30,59 +30,41 @@ void load_resources(LoadingScene *self)
     GameData *data = game_data_create();
     go_get_scene_manager(self)->data = data;
 
-    const char *images_noalpha[] = {"dither_blue"};
-    const char *images_alpha[] = {"sprites"};
-    const char *sprite_sheets_noalpha[] = {};
-    const char *sprite_sheets_alpha[] = {"sprites", "gecko"};
+    const char *images[] = {"dither_blue"};
+    const char *sprite_sheets[] = {"sprites", "gecko"};
     const char *tile_types[] = {};
-    const char *grid_atlases_alpha[] = {"font_big_2"};
-    const Size2DInt grid_atlases_alpha_sizes[] = {(Size2DInt){ 16, 28 }, (Size2DInt){ 16, 28 }, (Size2DInt){ 8, 16 }, (Size2DInt){ 8, 8 }, (Size2DInt){ 8, 14 }};
+    const char *grid_atlases[] = {"font_big_2"};
+    const Size2DInt grid_atlases_sizes[] = {(Size2DInt){ 16, 28 }};
 
-    const size_t images_noalpha_count = sizeof(images_noalpha) / sizeof(char *);
-    const size_t images_alpha_count = sizeof(images_alpha) / sizeof(char *);
-    const size_t sprite_sheets_noalpha_count = sizeof(sprite_sheets_noalpha) / sizeof(char *);
-    const size_t sprite_sheets_alpha_count = sizeof(sprite_sheets_alpha) / sizeof(char *);
-    const size_t grid_atlases_alpha_count = sizeof(grid_atlases_alpha) / sizeof(char *);
+    const size_t images_count = sizeof(images) / sizeof(char *);
+    const size_t sprite_sheets_count = sizeof(sprite_sheets) / sizeof(char *);
     const size_t tile_types_count = sizeof(tile_types) / sizeof(char *);
+    const size_t grid_atlases_count = sizeof(grid_atlases) / sizeof(char *);
 
-    for (int i = 0; i < images_noalpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, images_noalpha[i], NULL);
+    for (int i = 0; i < images_count; ++i) {
+        hashtable_put(self->assets_in_waiting, images[i], NULL);
     }
-    for (int i = 0; i < images_alpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, images_alpha[i], NULL);
-    }
-    for (int i = 0; i < sprite_sheets_noalpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, sprite_sheets_noalpha[i], NULL);
-    }
-    for (int i = 0; i < sprite_sheets_alpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, sprite_sheets_alpha[i], NULL);
-    }
-    for (int i = 0; i < grid_atlases_alpha_count; ++i) {
-        hashtable_put(self->assets_in_waiting, grid_atlases_alpha[i], NULL);
+    for (int i = 0; i < sprite_sheets_count; ++i) {
+        hashtable_put(self->assets_in_waiting, sprite_sheets[i], NULL);
     }
     for (int i = 0; i < tile_types_count; ++i) {
         hashtable_put(self->assets_in_waiting, tile_types[i], NULL);
     }
+    for (int i = 0; i < grid_atlases_count; ++i) {
+        hashtable_put(self->assets_in_waiting, grid_atlases[i], NULL);
+    }
 
-    describe_deubg_to_log(self->assets_in_waiting);
-
-    for (int i = 0; i < images_noalpha_count; ++i) {
-        load_image_data(images_noalpha[i], false, true, &loading_scene_asset_loaded_callback, self);
+    for (int i = 0; i < images_count; ++i) {
+        load_image_data(images[i], true, &loading_scene_asset_loaded_callback, self);
     }
-    for (int i = 0; i < images_alpha_count; ++i) {
-        load_image_data(images_alpha[i], true, true, &loading_scene_asset_loaded_callback, self);
-    }
-    for (int i = 0; i < sprite_sheets_noalpha_count; ++i) {
-        load_sprite_sheet(sprite_sheets_noalpha[i], false, &loading_scene_asset_loaded_callback, self);
-    }
-    for (int i = 0; i < sprite_sheets_alpha_count; ++i) {
-        load_sprite_sheet(sprite_sheets_alpha[i], true, &loading_scene_asset_loaded_callback, self);
-    }
-    for (int i = 0; i < grid_atlases_alpha_count; ++i) {
-        load_grid_atlas(grid_atlases_alpha[i], true, grid_atlases_alpha_sizes[i], &loading_scene_asset_loaded_callback, self);
+    for (int i = 0; i < sprite_sheets_count; ++i) {
+        load_sprite_sheet(sprite_sheets[i], &loading_scene_asset_loaded_callback, self);
     }
     for (int i = 0; i < tile_types_count; ++i) {
         load_tile_types(tile_types[i], data->tile_dictionary, &loading_scene_asset_loaded_callback, self);
+    }
+    for (int i = 0; i < grid_atlases_count; ++i) {
+        load_grid_atlas(grid_atlases[i], grid_atlases_sizes[i], &loading_scene_asset_loaded_callback, self);
     }
 }
 
