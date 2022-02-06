@@ -34,6 +34,12 @@ Then open a browser and head to [http://localhost:8000]()
 - Load asset files from server
 - Amazing console visualisation
 
+## Usage
+
+All game code is in the `game` directory. Custom scenes, game objects and game object components are added there. The first scene is creted in `main.c`, and passed to the `game_init` function. Examples of loading assets, creating game objects, changing scenes, and more can be found in `loading_scene.c` and `gecko_scene.c`.
+
+Assets live in the `assets` directory and are moved to `docs` from there.
+
 ## Rough Backlog
 
 - Audio
