@@ -36,8 +36,6 @@ const registerKeys = () => {
     const keyDown = (e) => {
         e = e || window.event
 
-        console.log(e.keyCode)
-
         if (e.keyCode == '37') {
             window.currentKeys.left = 1
             animateKeyDown(document.getElementById("button_left"))
