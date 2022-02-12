@@ -6,12 +6,17 @@
 #include <math.h>
 #include <string.h>
 #include "debug_draw.h"
+#include "camera_node.h"
 
 typedef struct {
     GAME_OBJECT;
     Label *w_info_label;
+    Label *w_camera_label;
     GameObject *w_head;
+    CameraNode *w_camera;
     DebugDraw *w_debug;
+    Controls previous_controls;
+    bool follow;
 } GeckoScene;
 
 Number timer = 0;
@@ -23,6 +28,34 @@ void gecko_scene_update(GameObject *scene, Number dt_ms)
     if (timer > nb_from_int(10000)) {
         profiler_schedule_end();
     }
+    
+    Controls controls = go_get_scene_manager(self)->controls;
+    
+    if (self->follow) {
+        camera_set_position(self->w_camera, self->w_head->position);
+    } else {
+        Number camera_speed = nb_from_int(200);
+        Number translate = nb_mul(dt_ms / 1000, camera_speed);
+        if (controls.button_up) {
+            camera_move(self->w_camera, vec(nb_zero, -translate));
+        }
+        if (controls.button_down) {
+            camera_move(self->w_camera, vec(nb_zero, translate));
+        }
+        if (controls.button_left) {
+            camera_move(self->w_camera, vec(-translate, nb_zero));
+        }
+        if (controls.button_right) {
+            camera_move(self->w_camera, vec(translate, nb_zero));
+        }
+    }
+
+    if (controls.button_b && !self->previous_controls.button_b) {
+        self->follow = !self->follow;
+        label_set_text(self->w_camera_label, self->follow ? "Camera: follow" : "Camera: D-pad");
+    }
+
+    self->previous_controls = controls;
 }
 
 void gecko_scene_fixed_update(GameObject *scene, Number dt_ms)
@@ -54,8 +87,26 @@ void gecko_scene_initialize(GameObject *scene)
         
     go_add_child(self, self->w_info_label);
     
+    self->w_camera_label = ({
+        Label *label = label_create("font4", "Camera: D-pad");
+        label->position.x = nb_from_int(SCREEN_WIDTH - 2);
+        label->position.y = nb_from_int(SCREEN_HEIGHT - 2);
+        label->anchor.x = nb_from_int(1);
+        label->anchor.y = nb_from_int(1);
+        label->rotate_and_scale = false;
+        label->invert = false;
+        label;
+    });
+        
+    go_add_child(self, self->w_camera_label);
+    
     self->w_debug = debugdraw_create();
     go_set_z_order(self->w_debug, 1000);
+    
+    self->w_camera = camera_create((Size2D){ nb_from_int(SCREEN_WIDTH), nb_from_int(SCREEN_HEIGHT) });
+    camera_set_position(self->w_camera, vec(nb_from_int(SCREEN_WIDTH / 2), nb_from_int(SCREEN_HEIGHT / 2)));
+    
+    go_add_child(self, self->w_camera);
     
     self->w_head = ({
         Sprite *sprite = sprite_create("Gecko_Head-5");
@@ -89,7 +140,7 @@ void gecko_scene_initialize(GameObject *scene)
         (GameObject *)sprite;
     });
 
-    go_add_child(self, self->w_head);
+    go_add_child(self->w_camera, self->w_head);
     go_add_child(self, self->w_debug);
 }
 

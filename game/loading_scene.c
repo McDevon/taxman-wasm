@@ -33,8 +33,8 @@ void load_resources(LoadingScene *self)
     const char *images[] = {"dither_blue"};
     const char *sprite_sheets[] = {"sprites", "gecko"};
     const char *tile_types[] = {};
-    const char *grid_atlases[] = {"font_big_2"};
-    const Size2DInt grid_atlases_sizes[] = {(Size2DInt){ 16, 28 }};
+    const char *grid_atlases[] = {"font_big_2", "font4"};
+    const Size2DInt grid_atlases_sizes[] = {(Size2DInt){ 16, 28 }, (Size2DInt){ 8, 14 }};
 
     const size_t images_count = sizeof(images) / sizeof(char *);
     const size_t sprite_sheets_count = sizeof(sprite_sheets) / sizeof(char *);

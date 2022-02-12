@@ -294,20 +294,20 @@ const getImageFile = async (utf8FileName, callback, context) => {
 }
 
 if (typeof mergeInto !== 'undefined') mergeInto(LibraryManager.library, {
-    start: () => {
+    start: function() {
         registerKeys()
         startRender()
     },
-    get_current_time: () => {
+    get_current_time: function() {
         return Date.now()
     },
-    get_text_file: (fileName, callback, context) => {
+    get_text_file: function(fileName, callback, context) {
         getTextFile(fileName, callback, context)
     },
-    get_image_file: (fileName, callback, context) => {
+    get_image_file: function(fileName, callback, context) {
         getImageFile(fileName, callback, context)
     },
-    log_in_js: (text) => {
+    log_in_js: function(text) {
         console.log(UTF8ToString(text))
     }
 });
