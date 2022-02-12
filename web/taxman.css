@@ -176,8 +176,8 @@ body {
   }
 
   .spinner {
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
     margin: 0;
     margin-top: 20px;
     margin-left: 20px;
@@ -195,7 +195,7 @@ body {
     border-top: 5px solid rgb(120, 120, 120);
     
     border-radius: 100%;
-    background-color: rgb(189, 215, 46);
+    background-color: rgb(130, 136, 190);
   }
 
   @-webkit-keyframes rotation {
@@ -245,7 +245,7 @@ body {
     border-right: 0px;
     padding-left: 0px;
     padding-right: 0px;
-    display: block;
+    display: none;
     background-color: black;
     color: white;
     font-family: 'Lucida Console', Monaco, monospace;
