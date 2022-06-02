@@ -11,6 +11,7 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intAr
 	   -I taxman-engine/Engine/Resources/ \
 	   -I taxman-engine/Engine/Scene/ \
 	   -I taxman-engine/Engine/Strings/ \
+	   -I taxman-engine/Engine/Tests/ \
 	   -I taxman-engine/Engine/Utils/ \
 	   -I taxman-engine/Tools/Camera/ \
 	   -I taxman-engine/Tools/Physics/ \
