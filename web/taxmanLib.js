@@ -404,23 +404,9 @@ const registerMouse = () => {
     window.buttonControl.actioncenterx = offset.x;
   };
 
-  const moveEvent = (event) => {
-    let userX = 0,
-      userY = 0,
-      identifier = -1;
-    if (event.type == "touchmove") {
-      const touch = event.touches[0];
-      userX = touch.clientX;
-      userY = touch.clientY;
-      identifier = touch.identifier;
-    } else if (event.type == "mousemove") {
-      userX = event.clientX;
-      userY = event.clientY;
-      identifier = 1;
-    }
-
+  const handleMove = (moveEvent, userX, userY, identifier) => {
     if (window.crankControl.touch == identifier) {
-      event.preventDefault();
+      moveEvent.preventDefault();
       const distance = {
         x: userX - window.crankControl.center.x,
         y: userY - window.crankControl.center.y,
@@ -437,7 +423,7 @@ const registerMouse = () => {
         window.crank = updateCrank(change + window.crankControl.startCrank);
       }
     } else if (window.buttonControl.dpad == identifier) {
-      event.preventDefault();
+      moveEvent.preventDefault();
 
       const position = {
         x: userX - window.buttonControl.dpadcenter.x,
@@ -462,7 +448,7 @@ const registerMouse = () => {
         setDpadButton(window.buttonControl.dpadbutton, previousButton);
       }
     } else if (window.buttonControl.actionarea == identifier) {
-      event.preventDefault();
+      moveEvent.preventDefault();
 
       const positionX = userX - window.buttonControl.actioncenterx;
 
@@ -478,15 +464,17 @@ const registerMouse = () => {
       }
     }
   };
-  const endEvent = (event) => {
-    let identifier = -1;
-    if (event.type == "touchend" || event.type == "touchcancel") {
-      const touch = event.changedTouches[0];
-      identifier = touch.identifier;
-    } else if (event.type == "mouseup") {
-      identifier = 1;
+  const moveEvent = (event) => {
+    if (event.type == "touchmove") {
+      event.touches.array.forEach((touch) => {
+        handleMove(event, touch.clientX, touch.clientY, touch.identifier);
+      });
+    } else if (event.type == "mousemove") {
+      handleMove(event, event.clientX, event.clientY, 1);
     }
+  };
 
+  const handleEnd = (endEvent, identifier) => {
     if (window.crankControl.touch == identifier) {
       event.preventDefault();
       window.crankControl.touch = -2;
@@ -502,6 +490,16 @@ const registerMouse = () => {
       event.preventDefault();
       setActionButton(0, window.buttonControl.actionbutton);
       window.buttonControl.actionarea = -2;
+    }
+  };
+
+  const endEvent = (event) => {
+    if (event.type == "touchend" || event.type == "touchcancel") {
+      event.touches.array.forEach((touch) => {
+        handleEnd(event, touch.identifier);
+      });
+    } else if (event.type == "mouseup") {
+      handleEnd(event, 1);
     }
   };
 
