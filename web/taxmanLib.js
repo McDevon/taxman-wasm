@@ -8,6 +8,15 @@ const vendorCheck = () => {
   }
 };
 
+const animateKeyDown = (element) => {
+  element.style.backgroundImage = "url(./button_down.png)";
+  element.style.lineHeight = "55px";
+};
+const animateKeyUp = (element) => {
+  element.style.backgroundImage = "url(./button_up.png)";
+  element.style.lineHeight = "45px";
+};
+
 const registerKeys = () => {
   window.currentKeys = {};
   window.currentKeys.left = 0;
@@ -34,18 +43,11 @@ const registerKeys = () => {
   window.buttonControl = {
     dpad: -2,
     dpadbutton: 0, // Left = 1, right = 2, up = 3, down = 4
-    a: -2,
-    b: -2,
+    dpadcenter: { x: 0, y: 0 },
+    actionarea: -2,
+    actionbutton: 0, // A = 1, B = 2
+    actioncenterx: 0,
     menu: -2,
-  };
-
-  const animateKeyDown = (element) => {
-    element.style.backgroundImage = "url(./button_down.png)";
-    element.style.lineHeight = "55px";
-  };
-  const animateKeyUp = (element) => {
-    element.style.backgroundImage = "url(./button_up.png)";
-    element.style.lineHeight = "45px";
   };
 
   const keyDown = (e) => {
@@ -147,6 +149,57 @@ const normalisedAngle = (angle) => {
 
 const registerMouse = () => {
   const crank = document.getElementById("crank");
+  const dpad = document.getElementById("dpad");
+  const menubutton = document.getElementById("button_menu");
+  const actionarea = document.getElementById("action_area");
+
+  const setDpadButton = (buttonDown, buttonUp) => {
+    if (buttonDown == 1) {
+      animateKeyDown(document.getElementById("button_left"));
+      window.currentKeys.left = 1;
+    } else if (buttonDown == 2) {
+      animateKeyDown(document.getElementById("button_right"));
+      window.currentKeys.right = 1;
+    } else if (buttonDown == 3) {
+      animateKeyDown(document.getElementById("button_up"));
+      window.currentKeys.up = 1;
+    } else if (buttonDown == 4) {
+      animateKeyDown(document.getElementById("button_down"));
+      window.currentKeys.down = 1;
+    }
+
+    if (buttonUp == 1) {
+      animateKeyUp(document.getElementById("button_left"));
+      window.currentKeys.left = 0;
+    } else if (buttonUp == 2) {
+      animateKeyUp(document.getElementById("button_right"));
+      window.currentKeys.right = 0;
+    } else if (buttonUp == 3) {
+      animateKeyUp(document.getElementById("button_up"));
+      window.currentKeys.up = 0;
+    } else if (buttonUp == 4) {
+      animateKeyUp(document.getElementById("button_down"));
+      window.currentKeys.down = 0;
+    }
+  };
+
+  const setActionButton = (buttonDown, buttonUp) => {
+    if (buttonDown == 1) {
+      animateKeyDown(document.getElementById("button_a"));
+      window.currentKeys.a = 1;
+    } else if (buttonDown == 2) {
+      animateKeyDown(document.getElementById("button_b"));
+      window.currentKeys.b = 1;
+    }
+
+    if (buttonUp == 1) {
+      animateKeyUp(document.getElementById("button_a"));
+      window.currentKeys.a = 0;
+    } else if (buttonUp == 2) {
+      animateKeyUp(document.getElementById("button_b"));
+      window.currentKeys.b = 0;
+    }
+  };
 
   const crankStartEvent = (event) => {
     event.preventDefault();
@@ -225,15 +278,132 @@ const registerMouse = () => {
       identifier = 1;
     }
 
-    const crank = document.getElementById("crank");
-    let e = crank;
+    const dpad = document.getElementById("dpad");
+    let e = dpad;
     let offset = { x: 0, y: 0 };
     while (e) {
       offset.x += e.offsetLeft;
       offset.y += e.offsetTop;
       e = e.offsetParent;
     }
+
+    offset.x += dpad.clientWidth / 2.0;
+    offset.y += dpad.clientHeight / 2.0;
+
+    if (
+      document.documentElement &&
+      (document.documentElement.scrollTop ||
+        document.documentElement.scrollLeft)
+    ) {
+      offset.x -= document.documentElement.scrollLeft;
+      offset.y -= document.documentElement.scrollTop;
+    } else if (
+      document.body &&
+      (document.body.scrollTop || document.body.scrollLeft)
+    ) {
+      offset.x -= document.body.scrollLeft;
+      offset.y -= document.body.scrollTop;
+    } else if (window.pageXOffset || window.pageYOffset) {
+      offset.x -= window.pageXOffset;
+      offset.y -= window.pageYOffset;
+    }
+
+    const position = {
+      x: userX - offset.x,
+      y: userY - offset.y,
+    };
+
+    if (position.x > position.y) {
+      if (position.x > -position.y) {
+        window.buttonControl.dpadbutton = 2;
+      } else {
+        window.buttonControl.dpadbutton = 3;
+      }
+    } else {
+      if (position.x > -position.y) {
+        window.buttonControl.dpadbutton = 4;
+      } else {
+        window.buttonControl.dpadbutton = 1;
+      }
+    }
+    setDpadButton(window.buttonControl.dpadbutton, 0);
+    window.buttonControl.dpad = identifier;
+    window.buttonControl.dpadcenter = offset;
   };
+  const menuStartEvent = (event) => {
+    event.preventDefault();
+    let identifier = -1;
+    if (event.type == "touchstart") {
+      identifier = event.touches[0].identifier;
+    } else if (event.type == "mousedown") {
+      identifier = 1;
+    }
+    window.currentKeys.menu = 1;
+    animateKeyDown(document.getElementById("button_menu"));
+    window.buttonControl.menu = identifier;
+  };
+  const actionStartEvent = (event) => {
+    event.preventDefault();
+    let userX = 0,
+      userY = 0,
+      identifier = -1;
+    if (event.type == "touchstart") {
+      const touch = event.touches[0];
+      userX = touch.clientX;
+      userY = touch.clientY;
+      identifier = touch.identifier;
+    } else if (event.type == "mousedown") {
+      userX = event.clientX;
+      userY = event.clientY;
+      identifier = 1;
+    }
+
+    const actionarea = document.getElementById("action_area");
+    let e = actionarea;
+    let offset = { x: 0, y: 0 };
+    while (e) {
+      offset.x += e.offsetLeft;
+      offset.y += e.offsetTop;
+      e = e.offsetParent;
+    }
+
+    offset.x += actionarea.clientWidth / 2.0;
+    offset.y += actionarea.clientHeight / 2.0;
+
+    if (
+      document.documentElement &&
+      (document.documentElement.scrollTop ||
+        document.documentElement.scrollLeft)
+    ) {
+      offset.x -= document.documentElement.scrollLeft;
+      offset.y -= document.documentElement.scrollTop;
+    } else if (
+      document.body &&
+      (document.body.scrollTop || document.body.scrollLeft)
+    ) {
+      offset.x -= document.body.scrollLeft;
+      offset.y -= document.body.scrollTop;
+    } else if (window.pageXOffset || window.pageYOffset) {
+      offset.x -= window.pageXOffset;
+      offset.y -= window.pageYOffset;
+    }
+
+    const position = {
+      x: userX - offset.x,
+      y: userY - offset.y,
+    };
+
+    if (position.x < 0) {
+      window.buttonControl.actionbutton = 2;
+    } else {
+      window.buttonControl.actionbutton = 1;
+    }
+
+    setActionButton(window.buttonControl.actionbutton, 0);
+    window.buttonControl.actionarea = identifier;
+    window.buttonControl.actioncenterx = offset.x;
+  };
+
   const moveEvent = (event) => {
     let userX = 0,
       userY = 0,
@@ -249,45 +419,103 @@ const registerMouse = () => {
       identifier = 1;
     }
 
-    if (window.crankControl.touch != identifier) {
-      return;
-    }
+    if (window.crankControl.touch == identifier) {
+      event.preventDefault();
+      const distance = {
+        x: userX - window.crankControl.center.x,
+        y: userY - window.crankControl.center.y,
+      };
+      if (Math.abs(distance.x) > 1 && Math.abs(distance.y) > 1) {
+        let currentAngle = (Math.atan2(distance.y, distance.x) * 180) / Math.PI;
+        if (currentAngle - window.crankControl.startAngle > 180) {
+          currentAngle -= 360;
+        }
+        if (currentAngle - window.crankControl.startAngle < -180) {
+          currentAngle += 360;
+        }
+        const change = currentAngle - window.crankControl.startAngle;
+        window.crank = updateCrank(change + window.crankControl.startCrank);
+      }
+    } else if (window.buttonControl.dpad == identifier) {
+      event.preventDefault();
 
-    event.preventDefault();
-    const distance = {
-      x: userX - window.crankControl.center.x,
-      y: userY - window.crankControl.center.y,
-    };
-    if (Math.abs(distance.x) > 1 && Math.abs(distance.y) > 1) {
-      let currentAngle = (Math.atan2(distance.y, distance.x) * 180) / Math.PI;
-      if (currentAngle - window.crankControl.startAngle > 180) {
-        currentAngle -= 360;
+      const position = {
+        x: userX - window.buttonControl.dpadcenter.x,
+        y: userY - window.buttonControl.dpadcenter.y,
+      };
+
+      const previousButton = window.buttonControl.dpadbutton;
+      if (position.x > position.y) {
+        if (position.x > -position.y) {
+          window.buttonControl.dpadbutton = 2;
+        } else {
+          window.buttonControl.dpadbutton = 3;
+        }
+      } else {
+        if (position.x > -position.y) {
+          window.buttonControl.dpadbutton = 4;
+        } else {
+          window.buttonControl.dpadbutton = 1;
+        }
       }
-      if (currentAngle - window.crankControl.startAngle < -180) {
-        currentAngle += 360;
+      if (window.buttonControl.dpadbutton != previousButton) {
+        setDpadButton(window.buttonControl.dpadbutton, previousButton);
       }
-      const change = currentAngle - window.crankControl.startAngle;
-      window.crank = updateCrank(change + window.crankControl.startCrank);
+    } else if (window.buttonControl.actionarea == identifier) {
+      event.preventDefault();
+
+      const positionX = userX - window.buttonControl.actioncenterx;
+
+      const previousButton = window.buttonControl.actionbutton;
+      if (positionX < 0) {
+        window.buttonControl.actionbutton = 2;
+      } else {
+        window.buttonControl.actionbutton = 1;
+      }
+
+      if (window.buttonControl.actionbutton != previousButton) {
+        setActionButton(window.buttonControl.actionbutton, previousButton);
+      }
     }
   };
   const endEvent = (event) => {
     let identifier = -1;
     if (event.type == "touchend" || event.type == "touchcancel") {
-      const touch = event.touches[0];
+      const touch = event.changedTouches[0];
       identifier = touch.identifier;
     } else if (event.type == "mouseup") {
       identifier = 1;
     }
 
-    if (window.crankControl.touch != identifier) {
-      return;
+    if (window.crankControl.touch == identifier) {
+      event.preventDefault();
+      window.crankControl.touch = -2;
+    } else if (window.buttonControl.dpad == identifier) {
+      event.preventDefault();
+      setDpadButton(0, window.buttonControl.dpadbutton);
+      window.buttonControl.dpad = -2;
+    } else if (window.buttonControl.menu == identifier) {
+      event.preventDefault();
+      window.currentKeys.menu = 0;
+      animateKeyUp(document.getElementById("button_menu"));
+    } else if (window.buttonControl.actionarea == identifier) {
+      event.preventDefault();
+      setActionButton(0, window.buttonControl.actionbutton);
+      window.buttonControl.actionarea = -2;
     }
-    event.preventDefault();
-    window.crankControl.touch = -2;
   };
 
   crank.addEventListener("touchstart", crankStartEvent);
   crank.addEventListener("mousedown", crankStartEvent);
+
+  dpad.addEventListener("touchstart", dpadStartEvent);
+  dpad.addEventListener("mousedown", dpadStartEvent);
+
+  menubutton.addEventListener("touchstart", menuStartEvent);
+  menubutton.addEventListener("mousedown", menuStartEvent);
+
+  actionarea.addEventListener("touchstart", actionStartEvent);
+  actionarea.addEventListener("mousedown", actionStartEvent);
 
   document.addEventListener("touchmove", moveEvent);
   document.addEventListener("mousemove", moveEvent);

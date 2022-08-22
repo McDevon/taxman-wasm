@@ -1,36 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Taxman Demo</title>
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="stylesheet" href="taxman.css">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="taxman.css" />
   </head>
   <body>
-
-    <div class="spinner" id='spinner'></div>
+    <div class="spinner" id="spinner"></div>
     <div class="emscripten" id="status">Loading...</div>
 
-    <div id='controls'>
-      <input type="button" value="Fullscreen" onclick="Module.requestFullscreen(false, false)">
+    <div id="controls">
+      <input
+        type="button"
+        value="Fullscreen"
+        onclick="Module.requestFullscreen(false, false)"
+      />
     </div>
     <div class="emscripten">
-      <progress value="0" max="100" id="progress" hidden=1></progress>
+      <progress value="0" max="100" id="progress" hidden="1"></progress>
     </div>
 
     <div class="console_box">
       <div class="console_yellow">
         <div class="canvas_border">
-          <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+          <canvas
+            class="emscripten"
+            id="canvas"
+            oncontextmenu="event.preventDefault()"
+            tabindex="-1"
+          ></canvas>
         </div>
         <div class="console_controls">
-          <div class="button" id="button_up">↑</div>
-          <div class="button" id="button_left">←</div>
-          <div class="button" id="button_right">→</div>
-          <div class="button" id="button_down">↓</div>
-          <div class="button" id="button_b">Z</div>
-          <div class="button" id="button_a">X</div>
+          <div id="dpad">
+            <div class="button" id="button_up">↑</div>
+            <div class="button" id="button_left">←</div>
+            <div class="button" id="button_right">→</div>
+            <div class="button" id="button_down">↓</div>
+          </div>
+          <div id="action_area">
+            <div class="button" id="button_b">Z</div>
+            <div class="button" id="button_a">X</div>
+          </div>
           <div class="button" id="button_menu">E</div>
           <div class="crank" id="crank">
             <div class="crank_label" id="crank_label_left">A</div>
@@ -39,19 +51,23 @@
             <div id="crank_arm_container">
               <div class="crank_arm"></div>
             </div>
-            <div class="crank_speed_control_label" id="crank_speed_label_up">↑ W</div>
-            <div class="crank_speed_control_label" id="crank_speed_label_down">↓ S</div>
-            <div class="crank_speed_control_label" id="crank_speed_label_value">100°/s</div>
+            <div class="crank_speed_control_label" id="crank_speed_label_up">
+              ↑ W
+            </div>
+            <div class="crank_speed_control_label" id="crank_speed_label_down">
+              ↓ S
+            </div>
+            <div class="crank_speed_control_label" id="crank_speed_label_value">
+              100°/s
+            </div>
           </div>
         </div>
       </div>
     </div>
     <textarea id="output" rows="8"></textarea>
 
-    <script type='text/javascript' src="loader.js"></script>
+    <script type="text/javascript" src="loader.js"></script>
     <script async type="text/javascript" src="core.js"></script>
     <script async type="text/javascript" src="taxmanLib.js"></script>
   </body>
 </html>
-
-
