@@ -26,10 +26,17 @@ const registerKeys = () => {
   window.crank = 0;
 
   window.crankControl = {
-    touch: false,
+    touch: -2,
     startAngle: 0,
     startCrank: 0,
     center: { x: 0, y: 0 },
+  };
+  window.buttonControl = {
+    dpad: -2,
+    dpadbutton: 0, // Left = 1, right = 2, up = 3, down = 4
+    a: -2,
+    b: -2,
+    menu: -2,
   };
 
   const animateKeyDown = (element) => {
@@ -140,8 +147,22 @@ const normalisedAngle = (angle) => {
 
 const registerMouse = () => {
   const crank = document.getElementById("crank");
-  crank.onmousedown = (event) => {
+
+  const crankStartEvent = (event) => {
     event.preventDefault();
+    let userX = 0,
+      userY = 0,
+      identifier = -1;
+    if (event.type == "touchstart") {
+      const touch = event.touches[0];
+      userX = touch.clientX;
+      userY = touch.clientY;
+      identifier = touch.identifier;
+    } else if (event.type == "mousedown") {
+      userX = event.clientX;
+      userY = event.clientY;
+      identifier = 1;
+    }
 
     const crank = document.getElementById("crank");
     let e = crank;
@@ -173,8 +194,8 @@ const registerMouse = () => {
     }
 
     const distance = {
-      x: event.clientX - offset.x,
-      y: event.clientY - offset.y,
+      x: userX - offset.x,
+      y: userY - offset.y,
     };
 
     if (Math.abs(distance.x) >= 0 && Math.abs(distance.y) >= 0) {
@@ -184,18 +205,58 @@ const registerMouse = () => {
       window.crankControl.startAngle = 0;
     }
 
-    window.crankControl.touch = true;
+    window.crankControl.touch = identifier;
     window.crankControl.startCrank = window.crank;
     window.crankControl.center = offset;
   };
-  document.onmousemove = (event) => {
-    if (!window.crankControl.touch) {
+  const dpadStartEvent = (event) => {
+    event.preventDefault();
+    let userX = 0,
+      userY = 0,
+      identifier = -1;
+    if (event.type == "touchstart") {
+      const touch = event.touches[0];
+      userX = touch.clientX;
+      userY = touch.clientY;
+      identifier = touch.identifier;
+    } else if (event.type == "mousedown") {
+      userX = event.clientX;
+      userY = event.clientY;
+      identifier = 1;
+    }
+
+    const crank = document.getElementById("crank");
+    let e = crank;
+    let offset = { x: 0, y: 0 };
+    while (e) {
+      offset.x += e.offsetLeft;
+      offset.y += e.offsetTop;
+      e = e.offsetParent;
+    }
+  };
+  const moveEvent = (event) => {
+    let userX = 0,
+      userY = 0,
+      identifier = -1;
+    if (event.type == "touchmove") {
+      const touch = event.touches[0];
+      userX = touch.clientX;
+      userY = touch.clientY;
+      identifier = touch.identifier;
+    } else if (event.type == "mousemove") {
+      userX = event.clientX;
+      userY = event.clientY;
+      identifier = 1;
+    }
+
+    if (window.crankControl.touch != identifier) {
       return;
     }
+
     event.preventDefault();
     const distance = {
-      x: event.clientX - window.crankControl.center.x,
-      y: event.clientY - window.crankControl.center.y,
+      x: userX - window.crankControl.center.x,
+      y: userY - window.crankControl.center.y,
     };
     if (Math.abs(distance.x) > 1 && Math.abs(distance.y) > 1) {
       let currentAngle = (Math.atan2(distance.y, distance.x) * 180) / Math.PI;
@@ -209,13 +270,31 @@ const registerMouse = () => {
       window.crank = updateCrank(change + window.crankControl.startCrank);
     }
   };
-  document.onmouseup = (event) => {
-    if (!window.crankControl.touch) {
+  const endEvent = (event) => {
+    let identifier = -1;
+    if (event.type == "touchend" || event.type == "touchcancel") {
+      const touch = event.touches[0];
+      identifier = touch.identifier;
+    } else if (event.type == "mouseup") {
+      identifier = 1;
+    }
+
+    if (window.crankControl.touch != identifier) {
       return;
     }
     event.preventDefault();
-    window.crankControl.touch = false;
+    window.crankControl.touch = -2;
   };
+
+  crank.addEventListener("touchstart", crankStartEvent);
+  crank.addEventListener("mousedown", crankStartEvent);
+
+  document.addEventListener("touchmove", moveEvent);
+  document.addEventListener("mousemove", moveEvent);
+
+  document.addEventListener("touchend", endEvent);
+  document.addEventListener("touchcancel", endEvent);
+  document.addEventListener("mouseup", endEvent);
 };
 
 const startRender = () => {
