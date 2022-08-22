@@ -26,7 +26,11 @@ void sdl_setup()
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
 }
 
-void platform_display_set_image(uint8_t *buffer)
+bool isPowerOfTwo(int value) {
+    return (value != 0) && ((value & (value - 1)) == 0);
+}
+
+void platform_display_set_image(uint8_t *buffer, ScreenRenderOptions *options)
 {
 #ifdef TEST_SDL_LOCK_OPTS
     EM_ASM("SDL.defaults.copyOnLock = false; SDL.defaults.discardOnLock = true; SDL.defaults.opaqueFrontBuffer = false;");
@@ -39,14 +43,31 @@ void platform_display_set_image(uint8_t *buffer)
     const uint8_t white[] = { 183, 182, 181 };
     const uint8_t black[] = { 14, 14, 13 };
 
-    const Uint32 sdl_white = SDL_MapRGBA(screen->format, white[0], white[1], white[2], 255);
-    const Uint32 sdl_black = SDL_MapRGBA(screen->format, black[0], black[1], black[2], 255);
+    const Uint32 sdl_white = options->invert ? SDL_MapRGBA(screen->format, black[0], black[1], black[2], 255) : SDL_MapRGBA(screen->format, white[0], white[1], white[2], 255);
+    const Uint32 sdl_black = options->invert ? SDL_MapRGBA(screen->format, white[0], white[1], white[2], 255) : SDL_MapRGBA(screen->format, black[0], black[1], black[2], 255);
 
-    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
-        const Uint32 *color = buffer[i] ? sdl_white : sdl_black;
-        int x = i % SCREEN_WIDTH;
-        int y = i / SCREEN_WIDTH;
-        *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = color;
+    if (options->screen_dither && isPowerOfTwo(options->screen_dither->size.width) && isPowerOfTwo(options->screen_dither->size.height)) {
+        uint32_t maskX = options->screen_dither->size.width - 1;
+        uint32_t maskY = options->screen_dither->size.height - 1;
+        uint32_t ditherWidth = options->screen_dither->size.width;
+        uint8_t *ditherBuffer = options->screen_dither->buffer;
+        for (uint32_t y = 0; y < SCREEN_HEIGHT; ++y) {
+            uint32_t ditherYComp = (y & maskY) * ditherWidth;
+            for (uint32_t x = 0; x < SCREEN_WIDTH; ++x) {
+                uint32_t ditherX = x & maskX;
+                uint32_t i = y * SCREEN_WIDTH + x;
+                const uint8_t bufferValue = buffer[i];
+                const uint8_t *color = bufferValue && bufferValue >= ditherBuffer[ditherYComp + ditherX] ? sdl_white : sdl_black;
+                *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = color;
+            }
+        }
+    } else {
+      for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
+          const Uint32 *color = buffer[i] ? sdl_white : sdl_black;
+          int x = i % SCREEN_WIDTH;
+          int y = i / SCREEN_WIDTH;
+          *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = color;
+      }
     }
     if (SDL_MUSTLOCK(screen)) {
         SDL_UnlockSurface(screen);
