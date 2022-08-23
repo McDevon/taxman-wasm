@@ -207,7 +207,7 @@ const registerMouse = () => {
       userY = 0,
       identifier = -1;
     if (event.type == "touchstart") {
-      const touch = event.touches[0];
+      const touch = event.touches[event.touches.length - 1];
       userX = touch.clientX;
       userY = touch.clientY;
       identifier = touch.identifier;
@@ -268,7 +268,7 @@ const registerMouse = () => {
       userY = 0,
       identifier = -1;
     if (event.type == "touchstart") {
-      const touch = event.touches[0];
+      const touch = event.touches[event.touches.length - 1];
       userX = touch.clientX;
       userY = touch.clientY;
       identifier = touch.identifier;
@@ -334,7 +334,7 @@ const registerMouse = () => {
     event.preventDefault();
     let identifier = -1;
     if (event.type == "touchstart") {
-      identifier = event.touches[0].identifier;
+      identifier = event.touches[event.touches.length - 1].identifier;
     } else if (event.type == "mousedown") {
       identifier = 1;
     }
@@ -342,13 +342,14 @@ const registerMouse = () => {
     animateKeyDown(document.getElementById("button_menu"));
     window.buttonControl.menu = identifier;
   };
+
   const actionStartEvent = (event) => {
     event.preventDefault();
     let userX = 0,
       userY = 0,
       identifier = -1;
     if (event.type == "touchstart") {
-      const touch = event.touches[0];
+      const touch = event.touches[event.touches.length - 1];
       userX = touch.clientX;
       userY = touch.clientY;
       identifier = touch.identifier;
@@ -466,9 +467,11 @@ const registerMouse = () => {
   };
   const moveEvent = (event) => {
     if (event.type == "touchmove") {
-      event.touches.array.forEach((touch) => {
+      const count = event.touches.length;
+      for (let i = 0; i < count; i++) {
+        const touch = event.touches[i];
         handleMove(event, touch.clientX, touch.clientY, touch.identifier);
-      });
+      }
     } else if (event.type == "mousemove") {
       handleMove(event, event.clientX, event.clientY, 1);
     }
@@ -476,18 +479,18 @@ const registerMouse = () => {
 
   const handleEnd = (endEvent, identifier) => {
     if (window.crankControl.touch == identifier) {
-      event.preventDefault();
+      endEvent.preventDefault();
       window.crankControl.touch = -2;
     } else if (window.buttonControl.dpad == identifier) {
-      event.preventDefault();
+      endEvent.preventDefault();
       setDpadButton(0, window.buttonControl.dpadbutton);
       window.buttonControl.dpad = -2;
     } else if (window.buttonControl.menu == identifier) {
-      event.preventDefault();
+      endEvent.preventDefault();
       window.currentKeys.menu = 0;
       animateKeyUp(document.getElementById("button_menu"));
     } else if (window.buttonControl.actionarea == identifier) {
-      event.preventDefault();
+      endEvent.preventDefault();
       setActionButton(0, window.buttonControl.actionbutton);
       window.buttonControl.actionarea = -2;
     }
@@ -495,10 +498,12 @@ const registerMouse = () => {
 
   const endEvent = (event) => {
     if (event.type == "touchend" || event.type == "touchcancel") {
-      event.touches.array.forEach((touch) => {
+      const count = event.changedTouches.length;
+      for (let i = 0; i < count; i++) {
+        const touch = event.changedTouches[i];
         handleEnd(event, touch.identifier);
-      });
-    } else if (event.type == "mouseup") {
+      }
+    } else if (event.type == "mouseup" || event.type == "mouseleave") {
       handleEnd(event, 1);
     }
   };
@@ -521,6 +526,7 @@ const registerMouse = () => {
   document.addEventListener("touchend", endEvent);
   document.addEventListener("touchcancel", endEvent);
   document.addEventListener("mouseup", endEvent);
+  document.addEventListener("mouseleave", endEvent);
 };
 
 const startRender = () => {
