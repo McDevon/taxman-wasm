@@ -554,6 +554,10 @@ const registerMouse = () => {
   document.addEventListener("touchcancel", endEvent);
   document.addEventListener("mouseup", endEvent);
   document.addEventListener("mouseleave", endEvent);
+
+  document.addEventListener("touchstart", (event) => {
+    event.preventDefault();
+  });
 };
 
 const rezoomScreen = () => {
