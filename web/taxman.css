@@ -2,6 +2,7 @@ body {
   font-family: arial;
   margin: 0;
   padding: none;
+  touch-action: none;
 }
 
 .emscripten {
