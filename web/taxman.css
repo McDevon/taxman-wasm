@@ -33,7 +33,7 @@ div.console_yellow {
 }
 div.console_controls {
   height: 185px;
-  width: 400px;
+  width: 440px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
@@ -43,11 +43,11 @@ div.console_controls {
   left: 0px;
   top: 0px;
   height: 175px;
-  width: 175px;
+  width: 215px;
   position: absolute;
 }
 #action_area {
-  left: 215px;
+  left: 235px;
   top: 110px;
   height: 75px;
   width: 170px;
@@ -115,19 +115,19 @@ div.crank_speed_control_label {
   position: absolute;
 }
 #button_up {
-  left: 63px;
+  left: 83px;
   top: 0px;
 }
 #button_left {
-  left: 0px;
+  left: 20px;
   top: 62px;
 }
 #button_right {
-  left: 121px;
+  left: 141px;
   top: 62px;
 }
 #button_down {
-  left: 63px;
+  left: 83px;
   top: 120px;
 }
 #button_a {
@@ -139,11 +139,11 @@ div.crank_speed_control_label {
   top: 10px;
 }
 #button_menu {
-  left: 140px;
+  left: 180px;
   top: 0px;
 }
 #crank {
-  left: 255px;
+  left: 275px;
   top: 5px;
 }
 #crank_label_left {

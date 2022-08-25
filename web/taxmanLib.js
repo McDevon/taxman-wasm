@@ -65,6 +65,11 @@ const registerKeys = () => {
     actioncenterx: 0,
     menu: -2,
   };
+  window.previousScreenStatus = {
+    orientation: 0, // Portrait = 0, Landscape = 1
+    width: 0,
+    height: 0,
+  };
 
   const keyDown = (e) => {
     e = e || window.event;
@@ -560,6 +565,75 @@ const registerMouse = () => {
   });
 };
 
+const setOrientation = (orientation) => {
+  console.log("orientation: " + orientation);
+  console.log("Changed to " + (orientation == 1 ? "landscape" : "portrait"));
+
+  const consoleYellow = document.getElementById("console_yellow");
+  const consoleControls = document.getElementById("console_controls");
+  const menuButton = document.getElementById("button_menu");
+  const actionArea = document.getElementById("action_area");
+  const crank = document.getElementById("crank");
+  if (orientation == 0) {
+    // Portrait
+    consoleYellow.style.padding = "10px";
+    consoleYellow.style.display = "inline-block";
+    consoleControls.style.position = "relative";
+    consoleControls.style.top = "";
+    consoleControls.style.left = "";
+    consoleControls.style.marginTop = "20px";
+    consoleControls.style.width = "440px";
+    menuButton.style.left = "180px";
+    menuButton.style.top = "0px";
+    actionArea.style.left = "235px";
+    crank.style.left = "275px";
+  } else {
+    // Landscape
+    consoleYellow.style.paddingLeft = "210px";
+    consoleYellow.style.paddingRight = "210px";
+    consoleYellow.style.display = "block";
+    consoleControls.style.position = "absolute";
+    consoleControls.style.top = "90px";
+    consoleControls.style.left = "10px";
+    consoleControls.style.marginTop = "0px";
+    consoleControls.style.width = "872px";
+    menuButton.style.left = "150px";
+    menuButton.style.top = "-30px";
+    actionArea.style.left = "676px";
+    crank.style.left = "689px";
+  }
+};
+
+const checkOrientation = () => {
+  console.log("resize " + window.innerWidth + ", " + window.innerHeight);
+  const currentWidth = window.innerWidth;
+  const currentHeight = window.innerHeight;
+
+  if (
+    window.previousScreenStatus.width == currentWidth ||
+    window.previousScreenStatus.height == currentHeight
+  ) {
+    return window.previousScreenStatus.orientation;
+  }
+
+  const currentOrientation = currentWidth > currentHeight ? 1 : 0;
+
+  if (currentOrientation == window.previousScreenStatus.orientation) {
+    return window.previousScreenStatus.orientation;
+  }
+
+  window.previousScreenStatus = {
+    orientation: currentOrientation,
+    width: currentWidth,
+    height: currentHeight,
+  };
+
+  console.log("width: " + currentWidth + " height: " + currentHeight);
+  setOrientation(currentOrientation);
+
+  return currentOrientation;
+};
+
 const rezoomScreen = () => {
   if (!mobileCheck()) {
     window.screenScale = 1;
@@ -580,6 +654,9 @@ const rezoomScreen = () => {
       "initial-scale=1, maximum-scale=1, user-scalable=0"
     );
   window.screenScale = 1 / scale;
+
+  checkOrientation();
+  window.addEventListener("resize", checkOrientation);
 };
 
 const startRender = () => {
