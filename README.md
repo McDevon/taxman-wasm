@@ -33,6 +33,7 @@ Then open a browser and head to [http://localhost:8000]()
 - Crank controls mapped to keys
 - Load asset files from server
 - Amazing console visualisation
+- Works on most mobile devices
 
 ## Usage
 
@@ -43,7 +44,6 @@ Assets live in the `assets` directory and are moved to `docs` from there.
 ## Rough Backlog
 
 - Audio
-- Mobile support
 - Migrate to SDL2 if it can be made more performant than SDL1
 
 ## Contributing
