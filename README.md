@@ -11,7 +11,7 @@ Online demo is [available here](https://mcdevon.github.io/taxman-wasm/).
 1. For compiling, [Emscripten](https://emscripten.org/docs/getting_started/downloads.html) needs to be installed and in `PATH`
 2. `make` is used as the build tool
 3. The example uses Python 3 for serving the page locally. Any other means of setting up a server is equally adequate
-4. To update the image assets, the Pillow library for python is required
+4. To update the image assets, the [Pillow](https://pypi.org/project/Pillow/) library for python is required
 
 ## How to run
 
