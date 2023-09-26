@@ -7310,11 +7310,11 @@ var wasmImports = {
 };
 var asm = createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors');
+var _memcpy = createExportWrapper('memcpy');
 var _malloc = createExportWrapper('malloc');
 var _free = createExportWrapper('free');
 var _read_text_callback = Module['_read_text_callback'] = createExportWrapper('read_text_callback');
 var _read_image_callback = Module['_read_image_callback'] = createExportWrapper('read_image_callback');
-var _memcpy = createExportWrapper('memcpy');
 var _main = Module['_main'] = createExportWrapper('__main_argc_argv');
 var _step = Module['_step'] = createExportWrapper('step');
 var ___errno_location = createExportWrapper('__errno_location');
