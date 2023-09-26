@@ -17,7 +17,9 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intAr
 	   -I taxman-engine/Tools/Physics/ \
 	   -I taxman-engine/Tools/Tilemap/ \
 	   -I platform/ \
-	   -I game/ # -D DEBUG
+	   -I game/GameData/ \
+	   -I game/Objects/ \
+	   -I game/Scenes/ # -D DEBUG
 
 OUT_DIR=docs
 OBJ_DIR=obj
@@ -40,7 +42,9 @@ CSRC = $(wildcard platform/*.c) \
        $(wildcard taxman-engine/Tools/Components/*.c) \
        $(wildcard taxman-engine/Tools/Physics/*.c) \
        $(wildcard taxman-engine/Tools/Tilemap/*.c) \
-       $(wildcard game/*.c)
+       $(wildcard game/GameData/*.c) \
+       $(wildcard game/Objects/*.c) \
+       $(wildcard game/Scenes/*.c)
 OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 
