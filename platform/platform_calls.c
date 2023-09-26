@@ -64,7 +64,7 @@ void platform_display_set_image(uint8_t *buffer, ScreenRenderOptions *options)
         }
     } else {
       for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; ++i) {
-          const Uint32 color = buffer[i] ? sdl_white : sdl_black;
+          const Uint32 color = buffer[i] > 128 ? sdl_white : sdl_black;
           int x = i % SCREEN_WIDTH;
           int y = i / SCREEN_WIDTH;
           *((Uint32 *)screen->pixels + y * SCREEN_WIDTH + x) = color;
