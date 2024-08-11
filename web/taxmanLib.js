@@ -24,6 +24,9 @@ const mobileCheck = () => {
   return ismobile;
 };
 
+let audioPool = [];
+let audioContext = null;
+
 const animateKeyDown = (element) => {
   element.style.backgroundImage = "url(./button_down.png)";
   element.style.lineHeight = "55px";
@@ -540,6 +543,20 @@ const registerMouse = () => {
     }
   };
 
+  const initialiseAudioEvent = async (event) => {
+    if (audioPool.length == 0) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioContext = new AudioContext();
+
+      console.log("touch anywhere " + audioPool.length);
+      for (let i = 0; i < 20; i++) {
+        let audio = new Audio();
+        audioPool.push(audio);
+      }
+      console.log("audiopool length " + audioPool.length);
+    }
+  };
+
   crank.addEventListener("touchstart", crankStartEvent);
   crank.addEventListener("mousedown", crankStartEvent);
 
@@ -551,6 +568,11 @@ const registerMouse = () => {
 
   actionarea.addEventListener("touchstart", actionStartEvent);
   actionarea.addEventListener("mousedown", actionStartEvent);
+
+  document.addEventListener("touchstart", initialiseAudioEvent);
+  document.addEventListener("mousedown", initialiseAudioEvent);
+  document.addEventListener("click", initialiseAudioEvent);
+  document.addEventListener("keydown", initialiseAudioEvent);
 
   document.addEventListener("touchmove", moveEvent);
   document.addEventListener("mousemove", moveEvent);
@@ -751,7 +773,7 @@ const startRender = () => {
   simulationLoop();
 };
 
-const getTextFile = async (utf8FileName, callback, context) => {
+const getTextFile = async (utf8FileName, userFile, callback, context) => {
   let fileName = UTF8ToString(utf8FileName);
   let response = await fetch("./" + fileName);
 
@@ -770,12 +792,41 @@ const getTextFile = async (utf8FileName, callback, context) => {
   Module.ccall(
     "read_text_callback",
     null,
-    ["number", "number", "number", "number"],
-    [fileNamePtr, textDataPtr, callback, context]
+    ["number", "number", "number", "number", "number"],
+    [fileNamePtr, textDataPtr, textDataLen, callback, context]
   );
 
   _free(fileNamePtr);
   _free(textDataPtr);
+};
+
+const getDataFile = async (utf8FileName, userFile, callback, context) => {
+  let fileName = UTF8ToString(utf8FileName);
+  let response = await fetch("./" + fileName);
+
+  if (response.status != 200) {
+    throw new Error("Server Error");
+  }
+  let blob = await response.blob();
+
+  let fileNameLen = lengthBytesUTF8(fileName) + 1;
+  let fileNamePtr = _malloc(fileNameLen);
+  stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+  let array = new Uint8Array(await blob.arrayBuffer());
+  let dataLen = blob.size;
+  let dataPtr = _malloc(dataLen);
+  stringToUTF8Array(textData, HEAP8, textDataPtr, textDataLen);
+
+  Module.ccall(
+    "read_data_callback",
+    null,
+    ["number", "number", "number", "number", "number"],
+    [fileNamePtr, textDataPtr, textDataLen, callback, context]
+  );
+
+  _free(fileNamePtr);
+  _free(dataPtr);
 };
 
 const returnImage = (image, canvas, fileName, callback, context) => {
@@ -846,6 +897,95 @@ const getImageFile = async (utf8FileName, callback, context) => {
   img.src = URL.createObjectURL(blob);
 };
 
+let audioCache = {};
+
+const getAudioFile = async (utf8FileName, callback, context) => {
+  let fileName = UTF8ToString(utf8FileName);
+  //let response = await fetch("./" + fileName.replace(/\.[^/.]+$/, "") + ".wav");
+  let audio = audioPool.length > 0 ? audioPool.pop() : null; // new Audio("./" + fileName.replace(/\.[^/.]+$/, "") + ".wav");
+
+  if (audio) {
+    let source = "./" + fileName.replace(/\.[^/.]+$/, "") + ".wav";
+    if (audio.src != source) {
+      audio.src = source;
+      audio.preload = "auto";
+    }
+  }
+
+  let fileNameLen = lengthBytesUTF8(fileName) + 1;
+  let fileNamePtr = _malloc(fileNameLen);
+  stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+  audioCache[fileName] = { pointer: fileNamePtr, audio: audio };
+  Module.ccall(
+    "load_audio_callback",
+    null,
+    ["number", "number", "number", "number"],
+    [fileNamePtr, fileNamePtr, callback, context]
+  );
+};
+
+const playAudioObject = async (audioObject) => {
+  let fileName = UTF8ToString(audioObject);
+  let audioData = audioCache[fileName];
+
+  if (!audioData) {
+    console.error("no audio for " + fileName);
+    return;
+  }
+  if (!audioData.audio) {
+    let audio = audioPool.length > 0 ? audioPool.pop() : null;
+    if (audio) {
+      let source = "./" + fileName.replace(/\.[^/.]+$/, "") + ".wav";
+      if (audio.src != source) {
+        audio.src = source;
+        audio.preload = "auto";
+      }
+    }
+    audioData.audio = audio;
+  }
+
+  if (!audioData.audio) {
+    return;
+  }
+
+  console.log("playing " + fileName);
+  //audioData.audio.currentTime = 0;
+  //audioData.audio.paused = false;
+  audioData.audio.play();
+};
+
+const stopAudioObject = async (audioObject) => {
+  let fileName = UTF8ToString(audioObject);
+  let audioData = audioCache[fileName];
+
+  if (!audioData) {
+    console.error("no audio for " + fileName);
+    return;
+  }
+
+  if (!audioData.audio) {
+    console.log("no audio data yet for " + fileName);
+    return;
+  }
+
+  audioData.audio.paused = true;
+  audioData.audio.currentTime = 0;
+};
+
+const freeAudioObject = async (audioObject) => {
+  let fileName = UTF8ToString(audioObject);
+  let audioData = audioCache[fileName];
+
+  if (!audioData) {
+    throw new Error("Server Error");
+  }
+
+  _free(audioData.pointer);
+  audioPool.push(audioData.audio);
+  audioCache[fileName] = null;
+};
+
 if (typeof mergeInto !== "undefined")
   mergeInto(LibraryManager.library, {
     start: function () {
@@ -857,11 +997,29 @@ if (typeof mergeInto !== "undefined")
     get_current_time: function () {
       return Date.now();
     },
-    get_text_file: function (fileName, callback, context) {
-      getTextFile(fileName, callback, context);
+    get_text_file: function (fileName, userFile, callback, context) {
+      getTextFile(fileName, userFile, callback, context);
+    },
+    get_data_file: function (fileName, userFile, callback, context) {
+      getDataFile(fileName, userFile, callback, context);
     },
     get_image_file: function (fileName, callback, context) {
       getImageFile(fileName, callback, context);
+    },
+    get_audio_file: function (fileName, callback, context) {
+      getAudioFile(fileName, callback, context);
+    },
+    play_audio_object: function (audio_object) {
+      playAudioObject(audio_object);
+    },
+    stop_audio_object: function (audio_object) {
+      stopAudioObject(audio_object);
+    },
+    free_audio_object: function (audio_object) {
+      freeAudioObject(audio_object);
+    },
+    get_file_exists: function (fileName, userFile, callback, context) {
+      getFileExists(fileName, userFile, callback, context);
     },
     log_in_js: function (text) {
       console.log(UTF8ToString(text));

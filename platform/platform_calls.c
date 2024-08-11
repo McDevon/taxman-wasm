@@ -12,8 +12,16 @@
 #endif
 
 extern double get_current_time();
-extern void get_text_file(const char *, load_text_data_callback_t *, void *);
+extern void get_text_file(const char *, bool, load_text_data_callback_t *, void *);
+extern void get_data_file(const char *, bool, load_raw_data_callback_t *, void *);
 extern void get_image_file(const char *, load_image_data_callback_t *, void *);
+extern void get_file_exists(const char *, bool, file_exists_callback_t *, void *);
+extern void put_text_file(const char *, const char *, size_t, write_success_callback_t *, void *);
+extern void put_data_file(const char *, const uint8_t *, size_t, write_success_callback_t *, void *);
+extern void get_audio_file(const char *, audio_object_callback_t *, void *);
+extern void play_audio_object(void *);
+extern void stop_audio_object(void *);
+extern void free_audio_object(void *);
 extern void log_in_js(const char *);
 
 static bool text_loaded = false;
@@ -126,9 +134,28 @@ void platform_print(const char *text)
     log_in_js(text);
 }
 
-void platform_read_text_file(const char *file_path, load_text_data_callback_t *callback, void *context)
+void platform_read_text_file(const char *file_path, const bool user_file, load_text_data_callback_t *callback, void *context)
 {
-    get_text_file(file_path, callback, context);
+    get_text_file(file_path, user_file, callback, context);
+}
+
+void platform_read_data_file(const char *file_path, const bool user_file, load_raw_data_callback_t *callback, void *context)
+{
+    get_data_file(file_path, user_file, callback, context);
+}
+
+void platform_write_text_file(const char *file_path, const char *text, size_t length, write_success_callback_t *callback, void *context)
+{
+    put_text_file(file_path, text, length, callback, context);
+}
+
+void platform_write_data_file(const char *file_path, const uint8_t *data, size_t length, write_success_callback_t *callback, void *context)
+{
+    put_data_file(file_path, data, length, callback, context);
+}
+void platform_file_exists(const char *file_path, const bool user_file, file_exists_callback_t *callback, void *context)
+{
+    get_file_exists(file_path, user_file, callback, context);
 }
 
 void platform_load_image(const char *file_path, load_image_data_callback_t *callback, void *context)
@@ -137,13 +164,45 @@ void platform_load_image(const char *file_path, load_image_data_callback_t *call
 }
 
 EMSCRIPTEN_KEEPALIVE
-void read_text_callback(const char *file_path, const char *text_data, load_text_data_callback_t *callback, void *context)
+void read_text_callback(const char *file_path, const char *text_data, size_t length, load_text_data_callback_t *callback, void *context)
 {
-    callback(file_path, text_data, context);
+    callback(file_path, text_data, length, context);
 }
 
 EMSCRIPTEN_KEEPALIVE
 void read_image_callback(const char *file_path, const uint32_t width, const uint32_t height, const bool alpha, const uint8_t *image_data, load_image_data_callback_t *callback, void *context)
 {
     callback(file_path, width, height, alpha, image_data, context);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void read_data_callback(const char *file_path, const uint8_t *data, size_t length, load_raw_data_callback_t *callback, void *context)
+{
+    callback(file_path, data, length, context);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void load_audio_callback(const char *file_path, void *audio_object, audio_object_callback_t *callback, void *context)
+{
+    callback(file_path, audio_object, context);
+}
+
+void platform_load_audio_file(const char *file_path, audio_object_callback_t *callback, void *context)
+{
+    get_audio_file(file_path, callback, context);
+}
+
+void platform_play_audio_object(void *audio_object)
+{
+    play_audio_object(audio_object);
+}
+
+void platform_stop_audio_object(void *audio_object)
+{
+    stop_audio_object(audio_object);
+}
+
+void platform_free_audio_object(void *audio_object)
+{
+    free_audio_object(audio_object);
 }
