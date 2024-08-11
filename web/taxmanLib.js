@@ -24,6 +24,18 @@ const mobileCheck = () => {
   return ismobile;
 };
 
+const base64ToBytes = (base64) => {
+  const binString = atob(base64);
+  return Uint8Array.from(binString, (m) => m.codePointAt(0));
+};
+
+const bytesToBase64 = (bytes) => {
+  const binString = Array.from(bytes, (byte) =>
+    String.fromCodePoint(byte)
+  ).join("");
+  return btoa(binString);
+};
+
 const animateKeyDown = (element) => {
   element.style.backgroundImage = "url(./button_down.png)";
   element.style.lineHeight = "55px";
@@ -536,7 +548,6 @@ const registerMouse = () => {
       }
     } else if (event.type == "mouseup" || event.type == "mouseleave") {
       handleEnd(event, 1);
-      console.log("mouse up");
     }
   };
 
@@ -780,31 +791,78 @@ const getTextFile = async (utf8FileName, userFile, callback, context) => {
 
 const getDataFile = async (utf8FileName, userFile, callback, context) => {
   let fileName = UTF8ToString(utf8FileName);
-  let response = await fetch("./" + fileName);
+  let outDataPtr = null;
+  let outDataLen = 0;
 
-  if (response.status != 200) {
-    throw new Error("Server Error");
+  if (userFile) {
+    const storedFile = localStorage.getItem(fileName);
+
+    let decoded = base64ToBytes(storedFile);
+    outDataLen = decoded.length;
+    outDataPtr = _malloc(outDataLen);
+
+    for (let i = 0; i < outDataLen; i++) {
+      HEAP8[outDataPtr + i] = decoded[i];
+    }
+  } else {
+    let response = await fetch("./" + fileName);
+
+    if (response.status == 200) {
+      let blob = await response.blob();
+
+      let array = new Uint8Array(await blob.arrayBuffer());
+      outDataLen = blob.size;
+      outDataPtr = _malloc(outDataLen);
+      for (let i = 0; i < outDataLen; i++) {
+        HEAP8[outDataPtr + i] = array[i];
+      }
+    }
   }
-  let blob = await response.blob();
 
   let fileNameLen = lengthBytesUTF8(fileName) + 1;
   let fileNamePtr = _malloc(fileNameLen);
   stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
 
-  let array = new Uint8Array(await blob.arrayBuffer());
-  let dataLen = blob.size;
-  let dataPtr = _malloc(dataLen);
-  stringToUTF8Array(textData, HEAP8, textDataPtr, textDataLen);
-
   Module.ccall(
     "read_data_callback",
     null,
     ["number", "number", "number", "number", "number"],
-    [fileNamePtr, textDataPtr, textDataLen, callback, context]
+    [fileNamePtr, outDataPtr, outDataLen, callback, context]
   );
 
   _free(fileNamePtr);
-  _free(dataPtr);
+  if (outDataPtr) {
+    _free(outDataPtr);
+  }
+};
+
+const putDataFile = (utf8FileName, inDataPtr, dataLen, callback, context) => {
+  let fileName = UTF8ToString(utf8FileName);
+  let success = false;
+
+  //uffer.from(str, 'base64') and buf.toString('base64').
+  let array = new Uint8Array(dataLen);
+
+  for (let i = 0; i < dataLen; i++) {
+    array[i] = HEAP8[inDataPtr + i];
+  }
+
+  let encoded = bytesToBase64(array); // array.buffer.toString("base64");
+
+  localStorage.setItem(fileName, encoded);
+
+  let fileNameLen = lengthBytesUTF8(fileName) + 1;
+  let fileNamePtr = _malloc(fileNameLen);
+  stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+  Module.ccall(
+    "write_data_callback",
+    null,
+    ["number", "number", "number", "number"],
+    [fileNamePtr, success, callback, context]
+  );
+
+  _free(fileNamePtr);
 };
 
 const returnImage = (image, canvas, fileName, callback, context) => {
@@ -873,6 +931,31 @@ const getImageFile = async (utf8FileName, callback, context) => {
   };
 
   img.src = URL.createObjectURL(blob);
+};
+
+const getFileExists = async (utf8FileName, userFile, callback, context) => {
+  let fileName = UTF8ToString(utf8FileName);
+  let exists = false;
+  if (userFile) {
+    const storedFile = localStorage.getItem(fileName);
+    exists = storedFile != null;
+  } else {
+    let response = await fetch("./" + fileName);
+    exists = response.status == 200;
+  }
+
+  let fileNameLen = lengthBytesUTF8(fileName) + 1;
+  let fileNamePtr = _malloc(fileNameLen);
+  stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+  Module.ccall(
+    "file_exists_callback",
+    null,
+    ["number", "number", "number", "number"],
+    [fileNamePtr, exists, callback, context]
+  );
+
+  _free(fileNamePtr);
 };
 
 let audioCache = {};
@@ -951,6 +1034,9 @@ if (typeof mergeInto !== "undefined")
     },
     get_data_file: function (fileName, userFile, callback, context) {
       getDataFile(fileName, userFile, callback, context);
+    },
+    put_data_file: function (fileName, data, length, callback, context) {
+      putDataFile(fileName, data, length, callback, context);
     },
     get_image_file: function (fileName, callback, context) {
       getImageFile(fileName, callback, context);

@@ -44,6 +44,8 @@ def create_makefile(source_dirs, header_dirs, main_file_dir, website_files):
                + '       -s EXPORTED_FUNCTIONS=\'["_main", "_read_text_callback", '
                + '"_load_audio_callback", '
                + '"_read_data_callback", '
+               + '"_write_data_callback", '
+               + '"_file_exists_callback", '
                + '"_read_image_callback"]\' \\\n'
                + '	     -fsanitize=undefined \\\n'
                + '       --js-library web/taxmanLib.js'

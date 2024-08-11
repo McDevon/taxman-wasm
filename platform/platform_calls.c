@@ -153,6 +153,7 @@ void platform_write_data_file(const char *file_path, const uint8_t *data, size_t
 {
     put_data_file(file_path, data, length, callback, context);
 }
+
 void platform_file_exists(const char *file_path, const bool user_file, file_exists_callback_t *callback, void *context)
 {
     get_file_exists(file_path, user_file, callback, context);
@@ -182,9 +183,21 @@ void read_data_callback(const char *file_path, const uint8_t *data, size_t lengt
 }
 
 EMSCRIPTEN_KEEPALIVE
+void write_data_callback(const char *file_path, bool success, write_success_callback_t *callback, void *context)
+{
+    callback(file_path, success, context);
+}
+
+EMSCRIPTEN_KEEPALIVE
 void load_audio_callback(const char *file_path, void *audio_object, audio_object_callback_t *callback, void *context)
 {
     callback(file_path, audio_object, context);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void file_exists_callback(const char *file_path, bool exists, file_exists_callback_t *callback, void *context)
+{
+    callback(file_path, exists, context);
 }
 
 void platform_load_audio_file(const char *file_path, audio_object_callback_t *callback, void *context)
