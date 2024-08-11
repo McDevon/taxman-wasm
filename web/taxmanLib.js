@@ -24,9 +24,6 @@ const mobileCheck = () => {
   return ismobile;
 };
 
-let audioPool = [];
-let audioContext = null;
-
 const animateKeyDown = (element) => {
   element.style.backgroundImage = "url(./button_down.png)";
   element.style.lineHeight = "55px";
@@ -543,20 +540,6 @@ const registerMouse = () => {
     }
   };
 
-  const initialiseAudioEvent = async (event) => {
-    if (audioPool.length == 0) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioContext();
-
-      console.log("touch anywhere " + audioPool.length);
-      for (let i = 0; i < 20; i++) {
-        let audio = new Audio();
-        audioPool.push(audio);
-      }
-      console.log("audiopool length " + audioPool.length);
-    }
-  };
-
   crank.addEventListener("touchstart", crankStartEvent);
   crank.addEventListener("mousedown", crankStartEvent);
 
@@ -568,11 +551,6 @@ const registerMouse = () => {
 
   actionarea.addEventListener("touchstart", actionStartEvent);
   actionarea.addEventListener("mousedown", actionStartEvent);
-
-  document.addEventListener("touchstart", initialiseAudioEvent);
-  document.addEventListener("mousedown", initialiseAudioEvent);
-  document.addEventListener("click", initialiseAudioEvent);
-  document.addEventListener("keydown", initialiseAudioEvent);
 
   document.addEventListener("touchmove", moveEvent);
   document.addEventListener("mousemove", moveEvent);
@@ -901,22 +879,17 @@ let audioCache = {};
 
 const getAudioFile = async (utf8FileName, callback, context) => {
   let fileName = UTF8ToString(utf8FileName);
-  //let response = await fetch("./" + fileName.replace(/\.[^/.]+$/, "") + ".wav");
-  let audio = audioPool.length > 0 ? audioPool.pop() : null; // new Audio("./" + fileName.replace(/\.[^/.]+$/, "") + ".wav");
 
-  if (audio) {
-    let source = "./" + fileName.replace(/\.[^/.]+$/, "") + ".wav";
-    if (audio.src != source) {
-      audio.src = source;
-      audio.preload = "auto";
-    }
-  }
+  let source = "./" + fileName.replace(/\.[^/.]+$/, "") + ".wav";
+  let sound = new Howl({
+    src: [source],
+  });
 
   let fileNameLen = lengthBytesUTF8(fileName) + 1;
   let fileNamePtr = _malloc(fileNameLen);
   stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
 
-  audioCache[fileName] = { pointer: fileNamePtr, audio: audio };
+  audioCache[fileName] = { pointer: fileNamePtr, audio: sound };
   Module.ccall(
     "load_audio_callback",
     null,
@@ -930,28 +903,10 @@ const playAudioObject = async (audioObject) => {
   let audioData = audioCache[fileName];
 
   if (!audioData) {
-    console.error("no audio for " + fileName);
-    return;
-  }
-  if (!audioData.audio) {
-    let audio = audioPool.length > 0 ? audioPool.pop() : null;
-    if (audio) {
-      let source = "./" + fileName.replace(/\.[^/.]+$/, "") + ".wav";
-      if (audio.src != source) {
-        audio.src = source;
-        audio.preload = "auto";
-      }
-    }
-    audioData.audio = audio;
-  }
-
-  if (!audioData.audio) {
+    console.error("audio effect not loaded: " + fileName);
     return;
   }
 
-  console.log("playing " + fileName);
-  //audioData.audio.currentTime = 0;
-  //audioData.audio.paused = false;
   audioData.audio.play();
 };
 
@@ -960,17 +915,11 @@ const stopAudioObject = async (audioObject) => {
   let audioData = audioCache[fileName];
 
   if (!audioData) {
-    console.error("no audio for " + fileName);
+    console.error("audio effect not loaded: " + fileName);
     return;
   }
 
-  if (!audioData.audio) {
-    console.log("no audio data yet for " + fileName);
-    return;
-  }
-
-  audioData.audio.paused = true;
-  audioData.audio.currentTime = 0;
+  audioData.audio.stop();
 };
 
 const freeAudioObject = async (audioObject) => {
@@ -978,11 +927,11 @@ const freeAudioObject = async (audioObject) => {
   let audioData = audioCache[fileName];
 
   if (!audioData) {
-    throw new Error("Server Error");
+    console.error("audio effect not loaded: " + fileName);
+    return;
   }
 
   _free(audioData.pointer);
-  audioPool.push(audioData.audio);
   audioCache[fileName] = null;
 };
 

@@ -67,7 +67,10 @@ clean:
 directories: ${OUT_DIR}
 
 assets:
-	bash scripts/generate_assets.sh
+	python scripts/generate_assets.py assets docs
+
+project:
+	python scripts/update_project.py
 
 ${OUT_DIR} ${OBJ_DIR}:
 	${MKDIR_P} $@
@@ -75,6 +78,7 @@ ${OUT_DIR} ${OBJ_DIR}:
 $(OUT_DIR)/button_down.png: $(COPY_DIR)/button_down.png
 $(OUT_DIR)/button_up.png: $(COPY_DIR)/button_up.png
 $(OUT_DIR)/favicon.ico: $(COPY_DIR)/favicon.ico
+$(OUT_DIR)/howler.js: $(COPY_DIR)/howler.js
 $(OUT_DIR)/index.html: $(COPY_DIR)/index.html
 $(OUT_DIR)/loader.js: $(COPY_DIR)/loader.js
 $(OUT_DIR)/taxman.css: $(COPY_DIR)/taxman.css

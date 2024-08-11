@@ -33,7 +33,7 @@ When developing a game, new assets and code directories can be added to the proj
 To update the makefile with the new code directories, run
 
 ```
-bash scripts/update_project.sh
+make project
 ```
 
 To build the game, run
@@ -61,6 +61,7 @@ The gecko demo that comes with the repository should be directly runnable by its
 - Load asset files from server
 - Amazing console visualisation
 - Works on most mobile devices (i.e. smartphones)
+- Audio effects using [howler.js](https://github.com/goldfire/howler.js)
 
 ## How to create a game
 
@@ -70,7 +71,6 @@ Assets live in the `assets` directory and are moved to `docs` from there. Subdir
 
 ## Rough Backlog
 
-- Audio
 - Migrate to SDL2 if it can be made more performant than SDL1
 
 ## Contributing
@@ -79,6 +79,15 @@ All contributions, especially issues, comments, and pull request are warmly welc
 
 If you happen to build any game-like experience with this, please send me a [tweet](https://twitter.com/jussienroos).
 
-## License
+# Licenses:
 
-This codebase is released under the MIT License.
+### [howler.js](https://github.com/goldfire/howler.js)
+
+```Copyright (c) 2013-2020 James Simpson and GoldFire Studios, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
