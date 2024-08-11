@@ -3,10 +3,11 @@
 
 CC=emcc
 CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString", "stackSave", "stackAlloc", "stackRestore"]' \
-       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback", "_read_image_callback"]' \
+       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback", "_load_audio_callback", "_read_data_callback", "_read_image_callback"]' \
 	     -fsanitize=undefined \
        --js-library web/taxmanLib.js \
        -I taxman-engine/Engine/Actions/ \
+       -I taxman-engine/Engine/Audio/ \
        -I taxman-engine/Engine/Components/ \
        -I taxman-engine/Engine/Logic/ \
        -I taxman-engine/Engine/Math/ \
@@ -18,10 +19,12 @@ CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intAr
        -I taxman-engine/Engine/Utils/ \
        -I taxman-engine/Tools/Components/ \
        -I taxman-engine/Tools/Physics/ \
+       -I taxman-engine/Tools/Serialisation/ \
        -I taxman-engine/Tools/Tilemap/ \
        -I game/GameData/ \
        -I game/Objects/ \
        -I game/Scenes/ \
+       -I game/Utils/ \
        -I platform/ # -D DEBUG
 
 OUT_DIR=docs
@@ -32,6 +35,7 @@ ASSETS_DIR=assets
 
 MKDIR_P=mkdir -p
 CSRC = $(wildcard taxman-engine/Engine/Actions/*.c) \
+       $(wildcard taxman-engine/Engine/Audio/*.c) \
        $(wildcard taxman-engine/Engine/Components/*.c) \
        $(wildcard taxman-engine/Engine/Logic/*.c) \
        $(wildcard taxman-engine/Engine/Math/*.c) \
@@ -43,10 +47,12 @@ CSRC = $(wildcard taxman-engine/Engine/Actions/*.c) \
        $(wildcard taxman-engine/Engine/Utils/*.c) \
        $(wildcard taxman-engine/Tools/Components/*.c) \
        $(wildcard taxman-engine/Tools/Physics/*.c) \
+       $(wildcard taxman-engine/Tools/Serialisation/*.c) \
        $(wildcard taxman-engine/Tools/Tilemap/*.c) \
        $(wildcard game/GameData/*.c) \
        $(wildcard game/Objects/*.c) \
        $(wildcard game/Scenes/*.c) \
+       $(wildcard game/Utils/*.c) \
        $(wildcard platform/*.c)
 OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
