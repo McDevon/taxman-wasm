@@ -3,7 +3,7 @@
 
 CC=emcc
 CFLAGS=-I. -v -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "allocate", "intArrayFromString", "stackSave", "stackAlloc", "stackRestore"]' \
-       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback", "_load_audio_callback", "_read_data_callback", "_file_exists_callback", "_read_image_callback"]' \
+       -s EXPORTED_FUNCTIONS='["_main", "_read_text_callback", "_load_audio_callback", "_read_data_callback", "_write_data_callback", "_file_exists_callback", "_read_image_callback"]' \
 	     -fsanitize=undefined \
        --js-library web/taxmanLib.js \
        -I taxman-engine/Engine/Actions/ \

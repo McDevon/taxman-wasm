@@ -838,18 +838,38 @@ const getDataFile = async (utf8FileName, userFile, callback, context) => {
 
 const putDataFile = (utf8FileName, inDataPtr, dataLen, callback, context) => {
   let fileName = UTF8ToString(utf8FileName);
-  let success = false;
 
-  //uffer.from(str, 'base64') and buf.toString('base64').
   let array = new Uint8Array(dataLen);
-
   for (let i = 0; i < dataLen; i++) {
     array[i] = HEAP8[inDataPtr + i];
   }
-
-  let encoded = bytesToBase64(array); // array.buffer.toString("base64");
+  let encoded = bytesToBase64(array);
 
   localStorage.setItem(fileName, encoded);
+
+  let fileNameLen = lengthBytesUTF8(fileName) + 1;
+  let fileNamePtr = _malloc(fileNameLen);
+  stringToUTF8Array(fileName, HEAP8, fileNamePtr, fileNameLen);
+
+  Module.ccall(
+    "write_data_callback",
+    null,
+    ["number", "number", "number", "number"],
+    [fileNamePtr, success, callback, context]
+  );
+
+  _free(fileNamePtr);
+};
+
+const putTextFile = (utf8FileName, utf8Text, dataLen, callback, context) => {
+  let fileName = UTF8ToString(utf8FileName);
+  let success = false;
+
+  let text = UTF8ToString(utf8Text);
+  if (dataLen < text.length) {
+    text = text.substring(0, dataLen);
+  }
+  localStorage.setItem(fileName, text);
 
   let fileNameLen = lengthBytesUTF8(fileName) + 1;
   let fileNamePtr = _malloc(fileNameLen);
@@ -1031,6 +1051,9 @@ if (typeof mergeInto !== "undefined")
     },
     get_text_file: function (fileName, userFile, callback, context) {
       getTextFile(fileName, userFile, callback, context);
+    },
+    put_text_file: function (fileName, text, length, callback, context) {
+      putTextFile(fileName, text, length, callback, context);
     },
     get_data_file: function (fileName, userFile, callback, context) {
       getDataFile(fileName, userFile, callback, context);
