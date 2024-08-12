@@ -57,7 +57,7 @@ CSRC = $(wildcard taxman-engine/Engine/Actions/*.c) \
 OBJ = $(CSRC:.c=.o)
 COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,$(wildcard ${COPY_DIR}/*))
 
-.PHONY: all clean directories assets
+.PHONY: all clean directories assets project deploy test run
 
 all: directories $(COPY_FILES) game assets
 

@@ -77,7 +77,7 @@ def create_makefile(source_dirs, header_dirs, main_file_dir, website_files):
                + 'COPY_FILES=$(patsubst ${COPY_DIR}/%,${OUT_DIR}/%,'
                + '$(wildcard ${COPY_DIR}/*))\n'
                + '\n'
-               + '.PHONY: all clean directories assets\n'
+               + '.PHONY: all clean directories assets project deploy test run\n'
                + '\n'
                + 'all: directories $(COPY_FILES) game assets\n'
                + '\n'
