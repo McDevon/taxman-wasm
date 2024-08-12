@@ -72,6 +72,11 @@ assets:
 project:
 	python scripts/update_project.py
 
+# Add your deploy script to the scripts directory if you wish
+# but make sure not to add any credentials to a git repository
+deploy:
+	bash scripts/deploy.sh
+
 ${OUT_DIR} ${OBJ_DIR}:
 	${MKDIR_P} $@
 

@@ -1,1 +1,4 @@
 *.o
+.vscode
+temp/
+scripts/deploy.sh
